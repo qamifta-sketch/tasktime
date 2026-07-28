@@ -1,29 +1,14 @@
 {
-  "name": "TaskTime - Manajemen Tugas",
+  "name": "TaskTime",
   "short_name": "TaskTime",
-  "description": "Aplikasi manajemen tugas dan waktu yang dapat digunakan secara offline.",
-  "lang": "id-ID",
-  "dir": "ltr",
-
+  "description": "Aplikasi manajemen tugas dan jadwal harian",
   "start_url": "./index.html",
   "scope": "./",
-
   "display": "standalone",
-  "display_override": [
-    "window-controls-overlay",
-    "standalone"
-  ],
-
   "orientation": "portrait",
-
-  "background_color": "#f6f7fb",
-  "theme_color": "#5b5bf7",
-
-  "categories": [
-    "productivity",
-    "utilities"
-  ],
-
+  "background_color": "#0f1020",
+  "theme_color": "#5146d8",
+  "lang": "id",
   "icons": [
     {
       "src": "./icon-192.png",
