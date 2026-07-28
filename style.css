@@ -1,0 +1,609 @@
+/* =========================
+   RESET
+========================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* =========================
+   BODY
+========================= */
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f5fb;
+    color: #222;
+    transition: 0.3s;
+    padding-bottom: 100px;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app {
+    max-width: 700px;
+    margin: auto;
+    min-height: 100vh;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+    background: #5146d8;
+    color: white;
+    padding: 28px 20px;
+    border-radius: 0 0 25px 25px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 32px;
+    margin-bottom: 5px;
+}
+
+header p {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+
+/* =========================
+   TOMBOL DARK MODE
+========================= */
+
+.theme-btn {
+    border: none;
+    background: white;
+    color: #5146d8;
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.theme-btn:active {
+    transform: scale(0.9);
+}
+
+
+/* =========================
+   HALAMAN
+========================= */
+
+.page {
+    display: none;
+}
+
+.page.active-page {
+    display: block;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+main {
+    padding: 20px;
+}
+
+
+/* =========================
+   WELCOME
+========================= */
+
+.welcome {
+    margin-bottom: 20px;
+}
+
+.welcome h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.welcome p {
+    color: #666;
+    font-size: 15px;
+}
+
+
+/* =========================
+   STATISTIK
+========================= */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.stat-card {
+    background: white;
+    padding: 18px 10px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+.stat-card span {
+    font-size: 25px;
+}
+
+.stat-card h2 {
+    margin: 7px 0;
+    color: #5146d8;
+    font-size: 25px;
+}
+
+.stat-card p {
+    font-size: 12px;
+    color: #777;
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 18px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+.card h2 {
+    font-size: 19px;
+    margin-bottom: 15px;
+}
+
+.card p {
+    line-height: 1.5;
+}
+
+
+/* =========================
+   INPUT & SELECT
+========================= */
+
+input,
+select {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    background: white;
+    color: #222;
+}
+
+input:focus,
+select:focus {
+    border-color: #5146d8;
+    box-shadow: 0 0 0 2px rgba(81, 70, 216, 0.1);
+}
+
+
+/* =========================
+   TOMBOL TAMBAH
+========================= */
+
+.add-btn {
+    width: 100%;
+    padding: 15px;
+    background: #5146d8;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.add-btn:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.progress-header h2 {
+    margin-bottom: 0;
+}
+
+#progressPercent {
+    font-weight: bold;
+    color: #5146d8;
+}
+
+.progress-bar {
+    height: 14px;
+    background: #e5e5ee;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #5146d8;
+    border-radius: 20px;
+    transition: width 0.4s;
+}
+
+
+/* =========================
+   DAFTAR TUGAS
+========================= */
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-header h2 {
+    margin-bottom: 0;
+}
+
+#taskCountLabel {
+    font-size: 13px;
+    color: #777;
+}
+
+
+/* =========================
+   TUGAS
+========================= */
+
+.task {
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 12px;
+    border-left: 5px solid #777;
+    background: #f7f7fb;
+}
+
+.task h3 {
+    margin-bottom: 8px;
+    font-size: 17px;
+}
+
+.task p {
+    font-size: 14px;
+    margin: 5px 0;
+    color: #666;
+}
+
+
+/* =========================
+   PRIORITAS
+========================= */
+
+.task.normal {
+    border-left-color: #777;
+}
+
+.task.important {
+    border-left-color: #f0a500;
+}
+
+.task.urgent {
+    border-left-color: #e53935;
+}
+
+
+/* =========================
+   TUGAS SELESAI
+========================= */
+
+.task.completed {
+    opacity: 0.6;
+}
+
+.task.completed h3 {
+    text-decoration: line-through;
+}
+
+
+/* =========================
+   TOMBOL TUGAS
+========================= */
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.task-actions button {
+    border: none;
+    padding: 10px 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.done-btn {
+    background: #dff5e5;
+    color: #187333;
+}
+
+.delete-btn {
+    background: #ffe1e1;
+    color: #c62828;
+}
+
+
+/* =========================
+   KOSONG
+========================= */
+
+.empty {
+    text-align: center;
+    color: #888;
+    padding: 25px 0;
+}
+
+
+/* =========================
+   JADWAL
+========================= */
+
+#scheduleList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+/* =========================
+   PENGATURAN
+========================= */
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.setting-item p {
+    color: #777;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.setting-btn {
+    border: none;
+    background: #5146d8;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+/* =========================
+   BOTTOM NAVIGATION
+========================= */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 100%;
+    max-width: 700px;
+    height: 90px;
+
+    background: white;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    border-top: 1px solid #ddd;
+
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.12);
+
+    z-index: 1000;
+
+    padding: 5px 10px;
+}
+
+
+/* =========================
+   ITEM NAVIGASI
+========================= */
+
+.nav-item {
+    flex: 1;
+    height: 75px;
+
+    border: none;
+    background: transparent;
+
+    color: #777;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 5px;
+
+    cursor: pointer;
+
+    border-radius: 15px;
+
+    transition: 0.2s;
+}
+
+.nav-item span {
+    font-size: 28px;
+}
+
+.nav-item small {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.nav-item.active {
+    color: #5146d8;
+    background: #f0efff;
+    font-weight: bold;
+}
+
+.nav-item:active {
+    transform: scale(0.95);
+}
+
+
+/* =========================
+   DARK MODE
+========================= */
+
+body.dark {
+    background: #181820;
+    color: #eee;
+}
+
+body.dark header {
+    background: #29245f;
+}
+
+body.dark .welcome p {
+    color: #bbb;
+}
+
+body.dark .card,
+body.dark .stat-card {
+    background: #24242e;
+    color: #eee;
+}
+
+body.dark .task {
+    background: #30303b;
+}
+
+body.dark .task p {
+    color: #bbb;
+}
+
+body.dark input,
+body.dark select {
+    background: #30303b;
+    color: white;
+    border-color: #555;
+}
+
+body.dark .progress-bar {
+    background: #444;
+}
+
+body.dark .theme-btn {
+    background: #30303b;
+    color: white;
+}
+
+body.dark .bottom-nav {
+    background: #24242e;
+    border-top-color: #444;
+}
+
+body.dark .nav-item {
+    color: #aaa;
+}
+
+body.dark .nav-item.active {
+    color: #8b83ff;
+    background: #35335a;
+}
+
+body.dark .setting-item p {
+    color: #aaa;
+}
+
+
+/* =========================
+   RESPONSIVE HP
+========================= */
+
+@media (max-width: 500px) {
+
+    main {
+        padding: 15px;
+    }
+
+    header {
+        padding: 25px 15px;
+    }
+
+    header h1 {
+        font-size: 28px;
+    }
+
+    .stats {
+        gap: 7px;
+    }
+
+    .stat-card {
+        padding: 14px 5px;
+    }
+
+    .stat-card h2 {
+        font-size: 22px;
+    }
+
+    .bottom-nav {
+        height: 90px;
+    }
+
+    .nav-item {
+        height: 75px;
+    }
+
+    .nav-item span {
+        font-size: 26px;
+    }
+
+    .nav-item small {
+        font-size: 12px;
+    }
+
+}

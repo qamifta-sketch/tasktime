@@ -1,0 +1,2614 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>TaskTime</title>
+
+<meta
+    name="theme-color"
+    content="#5146d8"
+>
+
+<link
+    rel="manifest"
+    href="manifest.json"
+>
+
+
+<style>
+
+/* =========================
+   RESET
+========================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* =========================
+   BODY
+========================= */
+
+body {
+
+    font-family:
+    Arial,
+    sans-serif;
+
+    background:
+    #f4f5fb;
+
+    color:
+    #222;
+
+    padding-bottom:
+    105px;
+
+    transition:
+    0.3s;
+
+}
+
+
+.app {
+
+    max-width:
+    700px;
+
+    margin:
+    auto;
+
+    min-height:
+    100vh;
+
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+
+    background:
+    #5146d8;
+
+    color:
+    white;
+
+    padding:
+    28px 20px;
+
+    border-radius:
+    0 0 25px 25px;
+
+}
+
+
+.header-top {
+
+    display:
+    flex;
+
+    justify-content:
+    space-between;
+
+    align-items:
+    center;
+
+}
+
+
+header h1 {
+
+    font-size:
+    32px;
+
+    margin-bottom:
+    5px;
+
+}
+
+
+header p {
+
+    font-size:
+    15px;
+
+    opacity:
+    0.9;
+
+}
+
+
+.theme-btn {
+
+    border:
+    none;
+
+    background:
+    white;
+
+    color:
+    #5146d8;
+
+    font-size:
+    24px;
+
+    width:
+    50px;
+
+    height:
+    50px;
+
+    border-radius:
+    50%;
+
+    cursor:
+    pointer;
+
+}
+
+
+/* =========================
+   PAGE
+========================= */
+
+.page {
+
+    display:
+    none;
+
+}
+
+
+.page.active {
+
+    display:
+    block;
+
+}
+
+
+main {
+
+    padding:
+    20px;
+
+}
+
+
+/* =========================
+   WELCOME
+========================= */
+
+.welcome {
+
+    margin-bottom:
+    20px;
+
+}
+
+
+.welcome h2 {
+
+    font-size:
+    24px;
+
+    margin-bottom:
+    5px;
+
+}
+
+
+.welcome p {
+
+    color:
+    #666;
+
+}
+
+
+/* =========================
+   STATISTIK
+========================= */
+
+.stats {
+
+    display:
+    grid;
+
+    grid-template-columns:
+    repeat(3, 1fr);
+
+    gap:
+    10px;
+
+    margin-bottom:
+    15px;
+
+}
+
+
+.stat-card {
+
+    background:
+    white;
+
+    padding:
+    18px 10px;
+
+    border-radius:
+    16px;
+
+    text-align:
+    center;
+
+    box-shadow:
+    0 3px 12px
+    rgba(0,0,0,0.06);
+
+}
+
+
+.stat-card span {
+
+    font-size:
+    25px;
+
+}
+
+
+.stat-card h2 {
+
+    margin:
+    7px 0;
+
+    color:
+    #5146d8;
+
+}
+
+
+.stat-card p {
+
+    font-size:
+    12px;
+
+    color:
+    #777;
+
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.card {
+
+    background:
+    white;
+
+    padding:
+    20px;
+
+    margin-bottom:
+    15px;
+
+    border-radius:
+    18px;
+
+    box-shadow:
+    0 3px 12px
+    rgba(0,0,0,0.06);
+
+}
+
+
+.card h2 {
+
+    font-size:
+    19px;
+
+    margin-bottom:
+    15px;
+
+}
+
+
+/* =========================
+   INPUT
+========================= */
+
+input,
+select {
+
+    width:
+    100%;
+
+    padding:
+    14px;
+
+    margin-bottom:
+    10px;
+
+    border:
+    1px solid #ddd;
+
+    border-radius:
+    10px;
+
+    font-size:
+    15px;
+
+    outline:
+    none;
+
+    background:
+    white;
+
+    color:
+    #222;
+
+}
+
+
+input:focus,
+select:focus {
+
+    border-color:
+    #5146d8;
+
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+.add-btn,
+.install-btn {
+
+    width:
+    100%;
+
+    padding:
+    15px;
+
+    background:
+    #5146d8;
+
+    color:
+    white;
+
+    border:
+    none;
+
+    border-radius:
+    10px;
+
+    font-size:
+    16px;
+
+    font-weight:
+    bold;
+
+    cursor:
+    pointer;
+
+    margin-top:
+    5px;
+
+}
+
+
+.install-btn {
+
+    display:
+    none;
+
+}
+
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress-header {
+
+    display:
+    flex;
+
+    justify-content:
+    space-between;
+
+    margin-bottom:
+    10px;
+
+}
+
+
+.progress-bar {
+
+    height:
+    14px;
+
+    background:
+    #e5e5ee;
+
+    border-radius:
+    20px;
+
+    overflow:
+    hidden;
+
+}
+
+
+.progress-fill {
+
+    height:
+    100%;
+
+    width:
+    0%;
+
+    background:
+    #5146d8;
+
+    transition:
+    0.4s;
+
+}
+
+
+/* =========================
+   TASK
+========================= */
+
+.task {
+
+    padding:
+    16px;
+
+    border-radius:
+    12px;
+
+    margin-top:
+    12px;
+
+    border-left:
+    5px solid #777;
+
+    background:
+    #f7f7fb;
+
+}
+
+
+.task h3 {
+
+    margin-bottom:
+    8px;
+
+}
+
+
+.task p {
+
+    font-size:
+    14px;
+
+    margin:
+    5px 0;
+
+    color:
+    #666;
+
+}
+
+
+.task.normal {
+
+    border-left-color:
+    #777;
+
+}
+
+
+.task.important {
+
+    border-left-color:
+    #f0a500;
+
+}
+
+
+.task.urgent {
+
+    border-left-color:
+    #e53935;
+
+}
+
+
+.task.completed {
+
+    opacity:
+    0.6;
+
+}
+
+
+.task.completed h3 {
+
+    text-decoration:
+    line-through;
+
+}
+
+
+.task-actions {
+
+    display:
+    flex;
+
+    gap:
+    8px;
+
+    margin-top:
+    12px;
+
+}
+
+
+.task-actions button {
+
+    border:
+    none;
+
+    padding:
+    10px;
+
+    border-radius:
+    8px;
+
+    cursor:
+    pointer;
+
+}
+
+
+.done-btn {
+
+    background:
+    #dff5e5;
+
+    color:
+    #187333;
+
+}
+
+
+.delete-btn {
+
+    background:
+    #ffe1e1;
+
+    color:
+    #c62828;
+
+}
+
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty {
+
+    text-align:
+    center;
+
+    color:
+    #888;
+
+    padding:
+    25px;
+
+}
+
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav {
+
+    position:
+    fixed;
+
+    bottom:
+    0;
+
+    left:
+    50%;
+
+    transform:
+    translateX(-50%);
+
+    width:
+    100%;
+
+    max-width:
+    700px;
+
+    height:
+    90px;
+
+    background:
+    white;
+
+    display:
+    flex;
+
+    justify-content:
+    space-around;
+
+    align-items:
+    center;
+
+    box-shadow:
+    0 -5px 20px
+    rgba(0,0,0,0.12);
+
+    z-index:
+    1000;
+
+}
+
+
+.nav-item {
+
+    flex:
+    1;
+
+    height:
+    75px;
+
+    border:
+    none;
+
+    background:
+    transparent;
+
+    color:
+    #777;
+
+    display:
+    flex;
+
+    flex-direction:
+    column;
+
+    justify-content:
+    center;
+
+    align-items:
+    center;
+
+    gap:
+    5px;
+
+    cursor:
+    pointer;
+
+    border-radius:
+    15px;
+
+}
+
+
+.nav-item span {
+
+    font-size:
+    28px;
+
+}
+
+
+.nav-item small {
+
+    font-size:
+    12px;
+
+}
+
+
+.nav-item.active {
+
+    color:
+    #5146d8;
+
+    background:
+    #f0efff;
+
+    font-weight:
+    bold;
+
+}
+
+
+/* =========================
+   DARK MODE
+========================= */
+
+body.dark {
+
+    background:
+    #181820;
+
+    color:
+    #eee;
+
+}
+
+
+body.dark header {
+
+    background:
+    #29245f;
+
+}
+
+
+body.dark .card,
+body.dark .stat-card {
+
+    background:
+    #24242e;
+
+    color:
+    #eee;
+
+}
+
+
+body.dark .task {
+
+    background:
+    #30303b;
+
+}
+
+
+body.dark .task p {
+
+    color:
+    #bbb;
+
+}
+
+
+body.dark input,
+body.dark select {
+
+    background:
+    #30303b;
+
+    color:
+    white;
+
+    border-color:
+    #555;
+
+}
+
+
+body.dark .bottom-nav {
+
+    background:
+    #24242e;
+
+}
+
+
+body.dark .nav-item {
+
+    color:
+    #aaa;
+
+}
+
+
+body.dark .nav-item.active {
+
+    color:
+    #8b83ff;
+
+    background:
+    #35335a;
+
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media
+(max-width:500px) {
+
+    main {
+
+        padding:
+        15px;
+
+    }
+
+
+    .stats {
+
+        gap:
+        7px;
+
+    }
+
+
+    .stat-card {
+
+        padding:
+        14px 5px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+<!-- ======================
+     HEADER
+====================== -->
+
+<header>
+
+<div class="header-top">
+
+<div>
+
+<h1>
+TaskTime
+</h1>
+
+<p>
+Pengingat Jadwal & Tugas
+</p>
+
+</div>
+
+
+<button
+class="theme-btn"
+onclick="toggleDarkMode()"
+>
+
+🌙
+
+</button>
+
+</div>
+
+</header>
+
+
+
+<!-- ======================
+     BERANDA
+====================== -->
+
+<main
+id="homePage"
+class="page active"
+>
+
+<section class="welcome">
+
+<h2>
+Halo! 👋
+</h2>
+
+<p>
+Yuk selesaikan tugasmu hari ini.
+</p>
+
+</section>
+
+
+<section class="stats">
+
+
+<div class="stat-card">
+
+<span>
+📋
+</span>
+
+<h2 id="totalTask">
+0
+</h2>
+
+<p>
+Total Tugas
+</p>
+
+</div>
+
+
+<div class="stat-card">
+
+<span>
+✅
+</span>
+
+<h2 id="doneTask">
+0
+</h2>
+
+<p>
+Selesai
+</p>
+
+</div>
+
+
+<div class="stat-card">
+
+<span>
+📊
+</span>
+
+<h2 id="progressText">
+0%
+</h2>
+
+<p>
+Progress
+</p>
+
+</div>
+
+
+</section>
+
+
+<section class="card">
+
+<div class="progress-header">
+
+<h2>
+📊 Progress
+</h2>
+
+<strong id="progressPercent">
+0%
+</strong>
+
+</div>
+
+
+<div class="progress-bar">
+
+<div
+id="progressBar"
+class="progress-fill"
+></div>
+
+</div>
+
+</section>
+
+
+<section class="card">
+
+<h2>
+🔔 Pengingat
+</h2>
+
+<div id="reminderList">
+
+<p class="empty">
+Belum ada pengingat.
+</p>
+
+</div>
+
+</section>
+
+</main>
+
+
+
+<!-- ======================
+     JADWAL
+====================== -->
+
+<main
+id="schedulePage"
+class="page"
+>
+
+<section class="card">
+
+<h2>
+📅 Jadwal & Deadline
+</h2>
+
+<div id="scheduleList">
+
+<p class="empty">
+Belum ada jadwal.
+</p>
+
+</div>
+
+</section>
+
+</main>
+
+
+
+<!-- ======================
+     TUGAS
+====================== -->
+
+<main
+id="tasksPage"
+class="page"
+>
+
+<section class="card">
+
+<h2>
+➕ Tambah Tugas
+</h2>
+
+
+<input
+id="taskInput"
+type="text"
+placeholder="Nama tugas..."
+>
+
+
+<input
+id="taskDate"
+type="datetime-local"
+>
+
+
+<select
+id="taskPriority"
+>
+
+<option value="normal">
+Prioritas Normal
+</option>
+
+<option value="important">
+⭐ Penting
+</option>
+
+<option value="urgent">
+🔥 Sangat Penting
+</option>
+
+</select>
+
+
+<button
+class="add-btn"
+onclick="addTask()"
+>
+
+Tambahkan Tugas
+
+</button>
+
+</section>
+
+
+<section class="card">
+
+<h2>
+🔍 Cari Tugas
+</h2>
+
+
+<input
+id="searchInput"
+type="text"
+placeholder="Cari tugas..."
+oninput="displayTasks()"
+>
+
+</section>
+
+
+<section class="card">
+
+<h2>
+📋 Daftar Tugas
+</h2>
+
+
+<div id="taskList">
+
+<p class="empty">
+Belum ada tugas.
+</p>
+
+</div>
+
+</section>
+
+</main>
+
+
+
+<!-- ======================
+     PENGATURAN
+====================== -->
+
+<main
+id="settingsPage"
+class="page"
+>
+
+<section class="card">
+
+<h2>
+⚙️ Pengaturan
+</h2>
+
+<p>
+Atur tampilan dan pengingat TaskTime.
+</p>
+
+<br>
+
+
+<button
+class="add-btn"
+onclick="toggleDarkMode()"
+>
+
+🌙 Ubah Mode Tampilan
+
+</button>
+
+
+<button
+id="notificationBtn"
+class="add-btn"
+onclick="requestNotification()"
+>
+
+🔔 Aktifkan Notifikasi
+
+</button>
+
+
+<button
+id="installBtn"
+class="install-btn"
+onclick="installApp()"
+>
+
+📱 Install TaskTime
+
+</button>
+
+</section>
+
+
+<section class="card">
+
+<h2>
+ℹ️ Tentang TaskTime
+</h2>
+
+<p>
+
+TaskTime membantu kamu mengatur
+tugas, jadwal, deadline, dan
+pengingat agar tidak lupa.
+
+</p>
+
+</section>
+
+</main>
+
+
+</div>
+
+
+
+<!-- ======================
+     BOTTOM NAV
+====================== -->
+
+<nav
+class="bottom-nav"
+>
+
+
+<button
+class="nav-item active"
+onclick="showPage('home', this)"
+>
+
+<span>
+🏠
+</span>
+
+<small>
+Beranda
+</small>
+
+</button>
+
+
+<button
+class="nav-item"
+onclick="showPage('schedule', this)"
+>
+
+<span>
+📅
+</span>
+
+<small>
+Jadwal
+</small>
+
+</button>
+
+
+<button
+class="nav-item"
+onclick="showPage('tasks', this)"
+>
+
+<span>
+✅
+</span>
+
+<small>
+Tugas
+</small>
+
+</button>
+
+
+<button
+class="nav-item"
+onclick="showPage('settings', this)"
+>
+
+<span>
+⚙️
+</span>
+
+<small>
+Pengaturan
+</small>
+
+</button>
+
+
+</nav>
+
+
+
+<script>
+
+/* =========================
+   DATA
+========================= */
+
+let tasks =
+JSON.parse(
+localStorage.getItem("tasks")
+) || [];
+
+
+let deferredPrompt =
+null;
+
+
+/* =========================
+   SIMPAN
+========================= */
+
+function saveTasks() {
+
+localStorage.setItem(
+"tasks",
+JSON.stringify(tasks)
+);
+
+}
+
+
+/* =========================
+   NAVIGASI
+========================= */
+
+function showPage(
+page,
+button
+) {
+
+
+document
+.querySelectorAll(".page")
+.forEach(
+item => {
+
+item.classList
+.remove("active");
+
+});
+
+
+document
+.querySelectorAll(".nav-item")
+.forEach(
+item => {
+
+item.classList
+.remove("active");
+
+});
+
+
+document
+.getElementById(
+page + "Page"
+)
+.classList
+.add("active");
+
+
+button
+.classList
+.add("active");
+
+
+if (
+page === "home"
+) {
+
+displayReminders();
+
+}
+
+
+if (
+page === "schedule"
+) {
+
+displaySchedule();
+
+}
+
+
+if (
+page === "tasks"
+) {
+
+displayTasks();
+
+}
+
+
+window.scrollTo(
+0,
+0
+);
+
+}
+
+
+/* =========================
+   TAMBAH TUGAS
+========================= */
+
+function addTask() {
+
+
+let name =
+document
+.getElementById(
+"taskInput"
+)
+.value
+.trim();
+
+
+let date =
+document
+.getElementById(
+"taskDate"
+)
+.value;
+
+
+let priority =
+document
+.getElementById(
+"taskPriority"
+)
+.value;
+
+
+if (
+!name
+) {
+
+alert(
+"Masukkan nama tugas!"
+);
+
+return;
+
+}
+
+
+if (
+!date
+) {
+
+alert(
+"Pilih deadline tugas!"
+);
+
+return;
+
+}
+
+
+tasks.push({
+
+id:
+Date.now(),
+
+name:
+name,
+
+date:
+date,
+
+priority:
+priority,
+
+completed:
+false
+
+});
+
+
+saveTasks();
+
+
+document
+.getElementById(
+"taskInput"
+)
+.value =
+"";
+
+
+document
+.getElementById(
+"taskDate"
+)
+.value =
+"";
+
+
+displayTasks();
+
+displaySchedule();
+
+displayReminders();
+
+updateStats();
+
+
+alert(
+"✅ Tugas berhasil ditambahkan!"
+);
+
+}
+
+
+/* =========================
+   TAMPIL TUGAS
+========================= */
+
+function displayTasks() {
+
+
+let list =
+document
+.getElementById(
+"taskList"
+);
+
+
+let search =
+document
+.getElementById(
+"searchInput"
+)
+.value
+.toLowerCase();
+
+
+list.innerHTML =
+"";
+
+
+let filtered =
+tasks.filter(
+task =>
+
+task.name
+.toLowerCase()
+.includes(search)
+
+);
+
+
+if (
+filtered.length === 0
+) {
+
+list.innerHTML =
+
+`<p class="empty">
+Belum ada tugas.
+</p>`;
+
+return;
+
+}
+
+
+filtered
+.sort(
+(a,b) =>
+
+new Date(a.date)
+-
+new Date(b.date)
+
+)
+.forEach(
+task => {
+
+
+let div =
+document
+.createElement(
+"div"
+);
+
+
+div.className =
+
+"task "
++
+task.priority;
+
+
+if (
+task.completed
+) {
+
+div.classList
+.add(
+"completed"
+);
+
+}
+
+
+let deadline =
+new Date(
+task.date
+);
+
+
+div.innerHTML = `
+
+<h3>
+
+${task.completed
+? "✅"
+: "📌"}
+
+${escapeHTML(
+task.name
+)}
+
+</h3>
+
+
+<p>
+
+📅
+
+${deadline.toLocaleString(
+"id-ID"
+)}
+
+</p>
+
+
+<p>
+
+${getCountdown(
+deadline
+)}
+
+</p>
+
+
+<div
+class="task-actions"
+>
+
+
+<button
+class="done-btn"
+onclick=
+"completeTask(${task.id})"
+>
+
+${
+task.completed
+? "↩️ Belum Selesai"
+: "✅ Selesai"
+}
+
+</button>
+
+
+<button
+class="delete-btn"
+onclick=
+"deleteTask(${task.id})"
+>
+
+🗑️ Hapus
+
+</button>
+
+
+</div>
+
+`;
+
+
+list.appendChild(
+div
+);
+
+});
+
+}
+
+
+/* =========================
+   JADWAL
+========================= */
+
+function displaySchedule() {
+
+
+let list =
+document
+.getElementById(
+"scheduleList"
+);
+
+
+list.innerHTML =
+"";
+
+
+if (
+tasks.length === 0
+) {
+
+list.innerHTML =
+
+`<p class="empty">
+Belum ada jadwal.
+</p>`;
+
+return;
+
+}
+
+
+[
+...tasks
+]
+.sort(
+(a,b) =>
+
+new Date(a.date)
+-
+new Date(b.date)
+
+)
+.forEach(
+task => {
+
+
+let div =
+document
+.createElement(
+"div"
+);
+
+
+div.className =
+
+"task "
++
+task.priority;
+
+
+if (
+task.completed
+) {
+
+div.classList
+.add(
+"completed"
+);
+
+}
+
+
+let deadline =
+new Date(
+task.date
+);
+
+
+div.innerHTML = `
+
+<h3>
+
+${task.completed
+? "✅"
+: "📌"}
+
+${escapeHTML(
+task.name
+)}
+
+</h3>
+
+
+<p>
+
+📅
+
+${deadline.toLocaleString(
+"id-ID"
+)}
+
+</p>
+
+
+<p>
+
+${getCountdown(
+deadline
+)}
+
+</p>
+
+`;
+
+
+list.appendChild(
+div
+);
+
+});
+
+}
+
+
+/* =========================
+   PENGINGAT
+========================= */
+
+function displayReminders() {
+
+
+let list =
+document
+.getElementById(
+"reminderList"
+);
+
+
+list.innerHTML =
+"";
+
+
+let now =
+new Date();
+
+
+let reminders =
+
+tasks
+.filter(
+task =>
+
+!task.completed
+
+)
+.filter(
+task => {
+
+
+let deadline =
+new Date(
+task.date
+);
+
+
+let hours =
+
+(
+deadline
+-
+now
+)
+/
+(
+1000 *
+60 *
+60
+);
+
+
+return (
+
+hours > 0
+&&
+hours <= 24
+
+);
+
+});
+
+
+if (
+reminders.length === 0
+) {
+
+list.innerHTML =
+
+`<p class="empty">
+
+Tidak ada deadline
+dalam 24 jam.
+
+</p>`;
+
+return;
+
+}
+
+
+reminders.forEach(
+task => {
+
+
+let deadline =
+new Date(
+task.date
+);
+
+
+let div =
+document
+.createElement(
+"div"
+);
+
+
+div.className =
+"task urgent";
+
+
+div.innerHTML = `
+
+<h3>
+
+🔔
+
+${escapeHTML(
+task.name
+)}
+
+</h3>
+
+
+<p>
+
+⚠️ Deadline
+
+${getCountdown(
+deadline
+)}
+
+</p>
+
+`;
+
+
+list.appendChild(
+div
+);
+
+});
+
+}
+
+
+/* =========================
+   COUNTDOWN
+========================= */
+
+function getCountdown(
+deadline
+) {
+
+
+let diff =
+
+deadline
+-
+new Date();
+
+
+if (
+diff <= 0
+) {
+
+return
+"⚠️ Deadline sudah lewat";
+
+}
+
+
+let days =
+
+Math.floor(
+
+diff
+/
+(
+1000 *
+60 *
+60 *
+24
+
+)
+
+);
+
+
+let hours =
+
+Math.floor(
+
+(
+diff
+%
+(
+1000 *
+60 *
+60 *
+24
+)
+
+)
+/
+(
+1000 *
+60 *
+60
+
+)
+
+);
+
+
+let minutes =
+
+Math.floor(
+
+(
+diff
+%
+(
+1000 *
+60 *
+60
+
+)
+
+)
+/
+(
+1000 *
+60
+
+)
+
+);
+
+
+if (
+days > 0
+) {
+
+return
+
+`⏳
+${days}
+hari
+${hours}
+jam lagi`;
+
+}
+
+
+if (
+hours > 0
+) {
+
+return
+
+`⏳
+${hours}
+jam
+${minutes}
+menit lagi`;
+
+}
+
+
+return
+
+`⏳
+${minutes}
+menit lagi`;
+
+}
+
+
+/* =========================
+   SELESAI
+========================= */
+
+function completeTask(
+id
+) {
+
+
+tasks =
+tasks.map(
+task => {
+
+
+if (
+task.id === id
+) {
+
+task.completed =
+!task.completed;
+
+}
+
+
+return task;
+
+});
+
+
+saveTasks();
+
+
+displayTasks();
+
+displaySchedule();
+
+displayReminders();
+
+updateStats();
+
+}
+
+
+/* =========================
+   HAPUS
+========================= */
+
+function deleteTask(
+id
+) {
+
+
+if (
+!confirm(
+"Yakin ingin menghapus tugas?"
+)
+) {
+
+return;
+
+}
+
+
+tasks =
+tasks.filter(
+task =>
+
+task.id !== id
+
+);
+
+
+saveTasks();
+
+
+displayTasks();
+
+displaySchedule();
+
+displayReminders();
+
+updateStats();
+
+}
+
+
+/* =========================
+   STATISTIK
+========================= */
+
+function updateStats() {
+
+
+let total =
+tasks.length;
+
+
+let done =
+
+tasks.filter(
+task =>
+
+task.completed
+
+).length;
+
+
+let progress =
+
+total === 0
+
+? 0
+
+:
+
+Math.round(
+
+done
+/
+total
+*
+100
+
+);
+
+
+document
+.getElementById(
+"totalTask"
+)
+.textContent =
+total;
+
+
+document
+.getElementById(
+"doneTask"
+)
+.textContent =
+done;
+
+
+document
+.getElementById(
+"progressText"
+)
+.textContent =
+
+progress
++
+"%";
+
+
+document
+.getElementById(
+"progressPercent"
+)
+.textContent =
+
+progress
++
+"%";
+
+
+document
+.getElementById(
+"progressBar"
+)
+.style
+.width =
+
+progress
++
+"%";
+
+}
+
+
+/* =========================
+   DARK MODE
+========================= */
+
+function toggleDarkMode() {
+
+
+document
+.body
+.classList
+.toggle(
+"dark"
+);
+
+
+let dark =
+
+document
+.body
+.classList
+.contains(
+"dark"
+);
+
+
+localStorage.setItem(
+"darkMode",
+dark
+);
+
+
+document
+.querySelector(
+".theme-btn"
+)
+.textContent =
+
+dark
+
+? "☀️"
+
+: "🌙";
+
+}
+
+
+if (
+
+localStorage.getItem(
+"darkMode"
+)
+
+===
+
+"true"
+
+) {
+
+
+document
+.body
+.classList
+.add(
+"dark"
+);
+
+
+document
+.querySelector(
+".theme-btn"
+)
+.textContent =
+"☀️";
+
+}
+
+
+/* =========================
+   NOTIFIKASI
+========================= */
+
+function requestNotification() {
+
+
+if (
+!(
+"Notification"
+in
+window
+)
+) {
+
+alert(
+"Browser tidak mendukung notifikasi."
+);
+
+return;
+
+}
+
+
+Notification
+.requestPermission()
+.then(
+permission => {
+
+
+if (
+permission ===
+"granted"
+) {
+
+
+document
+.getElementById(
+"notificationBtn"
+)
+.textContent =
+
+"✅ Notifikasi Aktif";
+
+
+alert(
+"🔔 Notifikasi berhasil diaktifkan!"
+);
+
+
+}
+
+});
+
+}
+
+
+/* =========================
+   PWA INSTALL
+========================= */
+
+window
+.addEventListener(
+"beforeinstallprompt",
+event => {
+
+
+event.preventDefault();
+
+
+deferredPrompt =
+event;
+
+
+document
+.getElementById(
+"installBtn"
+)
+.style
+.display =
+"block";
+
+});
+
+
+function installApp() {
+
+
+if (
+!deferredPrompt
+) {
+
+alert(
+
+"Install belum tersedia. Pastikan TaskTime sudah dibuka melalui GitHub Pages."
+
+);
+
+return;
+
+}
+
+
+deferredPrompt
+.prompt();
+
+
+deferredPrompt
+.userChoice
+.then(
+() => {
+
+
+deferredPrompt =
+null;
+
+
+document
+.getElementById(
+"installBtn"
+)
+.style
+.display =
+"none";
+
+});
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHTML(
+text
+) {
+
+
+let div =
+document
+.createElement(
+"div"
+);
+
+
+div.textContent =
+text;
+
+
+return div.innerHTML;
+
+}
+
+
+/* =========================
+   MULAI APLIKASI
+========================= */
+
+displayTasks();
+
+displaySchedule();
+
+displayReminders();
+
+updateStats();
+
+
+/* =========================
+   UPDATE OTOMATIS
+========================= */
+
+setInterval(
+function() {
+
+
+displayTasks();
+
+displaySchedule();
+
+displayReminders();
+
+updateStats();
+
+
+},
+60000
+);
+
+
+</script>
+
+<script>
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", function() {
+
+        navigator.serviceWorker
+        .register("./service-worker.js")
+        .then(function() {
+
+            console.log(
+                "TaskTime PWA aktif!"
+            );
+
+        })
+        .catch(function(error) {
+
+            console.log(
+                "PWA Error:",
+                error
+            );
+
+        });
+
+    });
+
+}
+
+</script>
+</body>
+
+</html>
