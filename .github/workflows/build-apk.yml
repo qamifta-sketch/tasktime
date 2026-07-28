@@ -11,47 +11,60 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      # 1. Ambil semua file dari repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Setup Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
+      # 3. Install Capacitor
       - name: Install dependencies
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core
+          npm install @capacitor/cli
+          npm install @capacitor/android
 
+      # 4. Buat konfigurasi Capacitor
       - name: Create Capacitor config
         run: |
           npx cap init TaskTime com.tasktime.app --web-dir www
 
+      # 5. Siapkan semua file website
       - name: Prepare web files
-  run: |
-    mkdir -p www
-    cp index.html www/index.html
-    cp style.css www/style.css
-    cp script.js www/script.js
-    cp manifest.json www/manifest.json
-    cp service-worker.js www/service-worker.js
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+          cp style.css www/style.css
+          cp script.js www/script.js
+          cp manifest.json www/manifest.json
+          cp service-worker.js www/service-worker.js
 
+      # 6. Tambahkan Android
       - name: Add Android
         run: npx cap add android
 
+      # 7. Salin file website ke Android
       - name: Copy web files
         run: npx cap copy android
 
+      # 8. Setup Java 21
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # 9. Build APK
       - name: Build APK
         working-directory: android
         run: ./gradlew assembleDebug
 
+      # 10. Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
