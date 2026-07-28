@@ -34,9 +34,13 @@ jobs:
           npx cap init TaskTime com.tasktime.app --web-dir www
 
       - name: Prepare web files
-        run: |
-          mkdir -p www
-          cp index.html www/index.html
+  run: |
+    mkdir -p www
+    cp index.html www/index.html
+    cp style.css www/style.css
+    cp script.js www/script.js
+    cp manifest.json www/manifest.json
+    cp service-worker.js www/service-worker.js
 
       - name: Add Android
         run: npx cap add android
