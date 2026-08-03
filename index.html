@@ -43,7 +43,9 @@
   <title>TaskTime</title>
 
 
-  <!-- PWA -->
+  <!-- =========================================
+       PWA MANIFEST
+  ========================================== -->
 
   <link
     rel="manifest"
@@ -51,7 +53,9 @@
   >
 
 
-  <!-- CSS -->
+  <!-- =========================================
+       CSS
+  ========================================== -->
 
   <link
     rel="stylesheet"
@@ -59,7 +63,9 @@
   >
 
 
-  <!-- ICON -->
+  <!-- =========================================
+       ICON
+  ========================================== -->
 
   <link
     rel="icon"
@@ -163,7 +169,7 @@
 
 
       <!-- =========================================
-           HOME
+           HOME PAGE
       ========================================== -->
 
       <section
@@ -173,7 +179,7 @@
       >
 
 
-        <!-- WELCOME -->
+        <!-- WELCOME CARD -->
 
         <div class="welcome-card">
 
@@ -343,38 +349,11 @@
           class="task-list"
         >
 
-          <div
-            id="emptyTodayState"
-            class="empty-state"
-          >
-
-            <div class="empty-icon">
-              📝
-            </div>
-
-            <h3>
-              Belum ada tugas
-            </h3>
-
-            <p>
-              Tambahkan tugas pertamamu untuk hari ini.
-            </p>
-
-            <button
-              id="emptyAddTaskButton"
-              class="primary-button"
-              type="button"
-            >
-              + Tambah Tugas
-            </button>
-
-          </div>
-
         </div>
 
 
 
-        <!-- UPCOMING -->
+        <!-- UPCOMING TASK -->
 
         <div class="section-header upcoming-header">
 
@@ -414,7 +393,7 @@
 
 
       <!-- =========================================
-           TASKS
+           TASKS PAGE
       ========================================== -->
 
       <section
@@ -522,25 +501,6 @@
           class="task-list"
         >
 
-          <div
-            id="emptyAllState"
-            class="empty-state"
-          >
-
-            <div class="empty-icon">
-              📋
-            </div>
-
-            <h3>
-              Belum ada tugas
-            </h3>
-
-            <p>
-              Semua tugasmu akan muncul di sini.
-            </p>
-
-          </div>
-
         </div>
 
       </section>
@@ -548,7 +508,7 @@
 
 
       <!-- =========================================
-           ADD TASK
+           ADD TASK PAGE
       ========================================== -->
 
       <section
@@ -803,7 +763,7 @@
 
 
       <!-- =========================================
-           CALENDAR
+           CALENDAR PAGE
       ========================================== -->
 
       <section
@@ -920,7 +880,7 @@
 
 
       <!-- =========================================
-           PROFILE
+           PROFILE PAGE
       ========================================== -->
 
       <section
@@ -954,7 +914,7 @@
 
 
 
-        <!-- PROFILE -->
+        <!-- PROFILE SETTINGS -->
 
         <div class="settings-section">
 
@@ -991,7 +951,7 @@
 
 
 
-        <!-- NOTIFICATION -->
+        <!-- NOTIFICATION SETTINGS -->
 
         <div class="settings-section">
 
@@ -1366,7 +1326,7 @@
 
 
   <!-- =========================================
-       OFFLINE
+       OFFLINE INDICATOR
   ========================================== -->
 
   <div
@@ -1381,7 +1341,7 @@
 
 
   <!-- =========================================
-       LOADING
+       LOADING SCREEN
   ========================================== -->
 
   <div
@@ -1409,7 +1369,6 @@
 
   <!-- =========================================
        FIREBASE
-       FIREBASE APP + FCM
   ========================================== -->
 
   <script type="module">
@@ -1426,7 +1385,6 @@
       onMessage
     } from
     "https://www.gstatic.com/firebasejs/12.1.0/firebase-messaging.js";
-
 
 
     /* =========================================
@@ -1456,6 +1414,13 @@
     };
 
 
+    /* =========================================
+       VAPID KEY
+    ========================================== */
+
+    const VAPID_KEY =
+      "BOi9IDnr2wddmz0gEBwwgLL3JP0P9Gt4Rcj_tGwq2j0NlaMXLyCSsas74VaylpHs9IJh1U9XMqHi66eYTXA4fnc";
+
 
     /* =========================================
        INITIALIZE FIREBASE
@@ -1467,30 +1432,35 @@
       );
 
 
-
     /* =========================================
-       INITIALIZE FIREBASE MESSAGING
+       INITIALIZE MESSAGING
     ========================================== */
 
-    const messaging =
-      getMessaging(
-        firebaseApp
+    let messaging = null;
+
+    try {
+
+      messaging =
+        getMessaging(
+          firebaseApp
+        );
+
+      console.log(
+        "Firebase Cloud Messaging siap."
       );
 
+    } catch (error) {
+
+      console.error(
+        "Firebase Messaging tidak tersedia:",
+        error
+      );
+
+    }
 
 
     /* =========================================
-       VAPID KEY
-    ========================================== */
-
-    const VAPID_KEY =
-      "BOi9IDnr2wddmz0gEBwwgLL3JP0P9Gt4Rcj_tGwq2j0NlaMXLyCSsas74VaylpHs9IJh1U9XMqHi66eYTXA4fnc";
-
-
-
-    /* =========================================
-       SIMPAN FIREBASE KE WINDOW
-       AGAR SCRIPT.JS BISA MENGAKSESNYA
+       GLOBAL FIREBASE OBJECT
     ========================================== */
 
     window.taskTimeFirebase = {
@@ -1513,88 +1483,133 @@
     };
 
 
-
     /* =========================================
-       TERIMA NOTIFIKASI SAAT APLIKASI TERBUKA
+       FOREGROUND MESSAGE
     ========================================== */
 
-    onMessage(
-      messaging,
-      function (payload) {
+    if (messaging) {
 
-        console.log(
-          "Pesan Firebase diterima:",
-          payload
-        );
+      onMessage(
+        messaging,
+        function (payload) {
 
-
-        const notification =
-          payload.notification || {};
-
-
-        const title =
-          notification.title ||
-          "TaskTime 🔔";
-
-
-        const body =
-          notification.body ||
-          "Kamu memiliki pengingat tugas.";
-
-
-        if (
-          typeof window.showToast ===
-          "function"
-        ) {
-
-          window.showToast(
-            "🔔",
-            body
+          console.log(
+            "Firebase message diterima:",
+            payload
           );
 
+
+          const notification =
+            payload.notification ||
+            {};
+
+
+          const title =
+            notification.title ||
+            "TaskTime 🔔";
+
+
+          const body =
+            notification.body ||
+            "Kamu memiliki pengingat tugas.";
+
+
+          /* Toast */
+
+          if (
+            typeof window.showToast ===
+            "function"
+          ) {
+
+            window.showToast(
+              "🔔",
+              body
+            );
+
+          }
+
+
+          /* Simpan notifikasi lokal */
+
+          try {
+
+            const saved =
+              localStorage.getItem(
+                "tasktime_notifications"
+              );
+
+
+            let notificationList =
+              saved
+              ? JSON.parse(saved)
+              : [];
+
+
+            notificationList.unshift({
+
+              id:
+                Date.now().toString(),
+
+              title:
+                title,
+
+              date:
+                new Date()
+                  .toISOString()
+                  .split("T")[0],
+
+              time:
+                new Date()
+                  .toTimeString()
+                  .slice(0, 5),
+
+              read:
+                false
+
+            });
+
+
+            notificationList =
+              notificationList.slice(
+                0,
+                50
+              );
+
+
+            localStorage.setItem(
+              "tasktime_notifications",
+              JSON.stringify(
+                notificationList
+              )
+            );
+
+
+            if (
+              typeof window.updateAllUI ===
+              "function"
+            ) {
+
+              window.updateAllUI();
+
+            }
+
+          } catch (error) {
+
+            console.error(
+              "Gagal menyimpan notifikasi:",
+              error
+            );
+
+          }
+
         }
+      );
 
-
-        /* Tambahkan ke notifikasi TaskTime */
-
-        if (
-          Array.isArray(
-            window.notifications
-          )
-        ) {
-
-          window.notifications.unshift({
-
-            id:
-              Date.now().toString(),
-
-            title:
-              title,
-
-            date:
-              new Date()
-                .toISOString()
-                .split("T")[0],
-
-            time:
-              new Date()
-                .toTimeString()
-                .slice(0, 5),
-
-            read:
-              false
-
-          });
-
-        }
-
-      }
-
-    );
+    }
 
 
     console.log(
-      "Firebase TaskTime berhasil dimuat."
+      "TaskTime Firebase berhasil dimuat."
     );
 
   </script>
@@ -1602,7 +1617,7 @@
 
 
   <!-- =========================================
-       TASKTIME SCRIPT
+       TASKTIME MAIN SCRIPT
   ========================================== -->
 
   <script src="./script.js"></script>
@@ -1670,7 +1685,9 @@
 
 
       if (!indicator) {
+
         return;
+
       }
 
 
@@ -1838,4 +1855,4 @@
 
 </body>
 
-  </html>
+        </html>
