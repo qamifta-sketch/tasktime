@@ -7,7 +7,7 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
   >
 
   <meta
@@ -42,16 +42,32 @@
 
   <title>TaskTime</title>
 
+
   <!-- PWA -->
+
   <link
     rel="manifest"
     href="./manifest.json"
   >
 
+
   <!-- CSS -->
+
   <link
     rel="stylesheet"
     href="./style.css"
+  >
+
+
+  <!-- ICON -->
+
+  <link
+    rel="icon"
+    href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+    <rect width='100' height='100' rx='22' fill='%235146d8'/>
+    <text x='50' y='68' font-size='60' text-anchor='middle' fill='white'>✓</text>
+    </svg>"
   >
 
 </head>
@@ -60,352 +76,1169 @@
 <body>
 
 
-<!-- =========================================
-     APP
-========================================= -->
-
-<div id="app">
-
-
   <!-- =========================================
-       HEADER
-  ========================================= -->
+       APP CONTAINER
+  ========================================== -->
 
-  <header class="top-header">
+  <div id="app">
 
-    <div class="header-left">
 
-      <div class="app-logo">
-        ✓
+    <!-- =========================================
+         TOP HEADER
+    ========================================== -->
+
+    <header class="top-header">
+
+      <div class="header-left">
+
+        <div class="app-logo">
+          ✓
+        </div>
+
+        <div class="header-title">
+
+          <h1>
+            TaskTime
+          </h1>
+
+          <p id="currentGreeting">
+            Selamat datang 👋
+          </p>
+
+        </div>
+
       </div>
 
-      <div class="header-title">
 
-        <h1>
-          TaskTime
-        </h1>
-
-        <p id="currentGreeting">
-          Selamat datang 👋
-        </p>
-
-      </div>
-
-    </div>
+      <div class="header-actions">
 
 
-    <div class="header-actions">
+        <!-- NOTIFICATION -->
 
-      <button
-        id="notificationButton"
-        class="icon-button"
-        type="button"
-        aria-label="Notifikasi"
-      >
-
-        🔔
-
-        <span
-          id="notificationBadge"
-          class="notification-badge"
+        <button
+          id="notificationButton"
+          class="icon-button"
+          type="button"
+          aria-label="Notifikasi"
         >
-          0
-        </span>
 
-      </button>
+          🔔
 
+          <span
+            id="notificationBadge"
+            class="notification-badge"
+          >
+            0
+          </span>
 
-      <button
-        id="profileButton"
-        class="profile-button"
-        type="button"
-        aria-label="Profil"
-      >
-
-        <span id="profileInitial">
-          U
-        </span>
-
-      </button>
-
-    </div>
-
-  </header>
+        </button>
 
 
+        <!-- PROFILE -->
 
-  <!-- =========================================
-       MAIN
-  ========================================= -->
+        <button
+          id="profileButton"
+          class="profile-button"
+          type="button"
+          aria-label="Profil"
+        >
 
-  <main class="main-content">
+          <span id="profileInitial">
+            U
+          </span>
 
-
-    <!-- =======================================
-         HOME
-    ======================================= -->
-
-    <section
-      id="homePage"
-      class="page active"
-    >
-
-      <div class="welcome-card">
-
-        <div class="welcome-text">
-
-          <p class="small-label">
-            Hari ini
-          </p>
-
-          <h2 id="todayDate">
-            Hari ini
-          </h2>
-
-          <p>
-            Tetap produktif dan selesaikan tugasmu.
-          </p>
-
-        </div>
-
-
-        <div class="welcome-icon">
-          📚
-        </div>
+        </button>
 
       </div>
 
+    </header>
 
 
-      <!-- STATISTICS -->
 
-      <div class="stats-grid">
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="main-content">
 
 
-        <div class="stat-card">
+      <!-- =========================================
+           HOME
+      ========================================== -->
 
-          <div class="stat-icon">
-            📋
+      <section
+        id="homePage"
+        class="page active"
+        data-page="home"
+      >
+
+
+        <!-- WELCOME -->
+
+        <div class="welcome-card">
+
+          <div class="welcome-text">
+
+            <p class="small-label">
+              Hari ini
+            </p>
+
+            <h2 id="todayDate">
+              Hari ini
+            </h2>
+
+            <p>
+              Tetap produktif dan selesaikan tugasmu.
+            </p>
+
           </div>
 
-          <div class="stat-info">
 
-            <span
-              id="totalTaskCount"
-              class="stat-number"
-            >
-              0
-            </span>
+          <div class="welcome-icon">
+            📚
+          </div>
 
-            <span class="stat-label">
-              Total Tugas
-            </span>
+        </div>
+
+
+
+        <!-- STATISTICS -->
+
+        <div class="stats-grid">
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon">
+              📋
+            </div>
+
+            <div class="stat-info">
+
+              <span
+                class="stat-number"
+                id="totalTaskCount"
+              >
+                0
+              </span>
+
+              <span class="stat-label">
+                Total Tugas
+              </span>
+
+            </div>
+
+          </div>
+
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon">
+              ⏳
+            </div>
+
+            <div class="stat-info">
+
+              <span
+                class="stat-number"
+                id="pendingTaskCount"
+              >
+                0
+              </span>
+
+              <span class="stat-label">
+                Belum Selesai
+              </span>
+
+            </div>
+
+          </div>
+
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon">
+              ✅
+            </div>
+
+            <div class="stat-info">
+
+              <span
+                class="stat-number"
+                id="completedTaskCount"
+              >
+                0
+              </span>
+
+              <span class="stat-label">
+                Selesai
+              </span>
+
+            </div>
+
+          </div>
+
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon">
+              🔥
+            </div>
+
+            <div class="stat-info">
+
+              <span
+                class="stat-number"
+                id="priorityTaskCount"
+              >
+                0
+              </span>
+
+              <span class="stat-label">
+                Prioritas
+              </span>
+
+            </div>
 
           </div>
 
         </div>
 
 
-        <div class="stat-card">
 
-          <div class="stat-icon">
-            ⏳
+        <!-- TODAY TASK -->
+
+        <div class="section-header">
+
+          <div>
+
+            <h2>
+              Tugas Hari Ini
+            </h2>
+
+            <p>
+              Kelola tugas yang harus kamu selesaikan.
+            </p>
+
           </div>
 
-          <div class="stat-info">
 
-            <span
-              id="pendingTaskCount"
-              class="stat-number"
+          <button
+            id="quickAddButton"
+            class="text-button"
+            type="button"
+          >
+            + Tambah
+          </button>
+
+        </div>
+
+
+
+        <div
+          id="todayTaskList"
+          class="task-list"
+        >
+
+          <div
+            id="emptyTodayState"
+            class="empty-state"
+          >
+
+            <div class="empty-icon">
+              📝
+            </div>
+
+            <h3>
+              Belum ada tugas
+            </h3>
+
+            <p>
+              Tambahkan tugas pertamamu untuk hari ini.
+            </p>
+
+            <button
+              id="emptyAddTaskButton"
+              class="primary-button"
+              type="button"
             >
-              0
-            </span>
-
-            <span class="stat-label">
-              Belum Selesai
-            </span>
+              + Tambah Tugas
+            </button>
 
           </div>
 
         </div>
 
 
-        <div class="stat-card">
 
-          <div class="stat-icon">
-            ✅
+        <!-- UPCOMING -->
+
+        <div class="section-header upcoming-header">
+
+          <div>
+
+            <h2>
+              Tugas Mendatang
+            </h2>
+
+            <p>
+              Jangan sampai lupa dengan tugasmu.
+            </p>
+
           </div>
 
-          <div class="stat-info">
 
-            <span
-              id="completedTaskCount"
-              class="stat-number"
-            >
-              0
-            </span>
+          <button
+            id="viewAllTasksButton"
+            class="text-button"
+            type="button"
+          >
+            Lihat Semua
+          </button>
 
-            <span class="stat-label">
-              Selesai
-            </span>
+        </div>
+
+
+        <div
+          id="upcomingTaskList"
+          class="task-list"
+        >
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================================
+           TASKS
+      ========================================== -->
+
+      <section
+        id="tasksPage"
+        class="page"
+        data-page="tasks"
+      >
+
+        <div class="page-header">
+
+          <div>
+
+            <h2>
+              Semua Tugas
+            </h2>
+
+            <p>
+              Kelola semua tugasmu di satu tempat.
+            </p>
+
+          </div>
+
+
+          <button
+            id="addTaskFromTasksPage"
+            class="primary-button small"
+            type="button"
+          >
+            + Tugas
+          </button>
+
+        </div>
+
+
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+          <span class="search-icon">
+            🔍
+          </span>
+
+          <input
+            type="search"
+            id="taskSearchInput"
+            placeholder="Cari tugas..."
+            autocomplete="off"
+          >
+
+          <button
+            id="clearSearchButton"
+            type="button"
+            aria-label="Hapus pencarian"
+          >
+            ✕
+          </button>
+
+        </div>
+
+
+
+        <!-- FILTER -->
+
+        <div class="filter-container">
+
+          <button
+            class="filter-button active"
+            data-filter="all"
+            type="button"
+          >
+            Semua
+          </button>
+
+          <button
+            class="filter-button"
+            data-filter="pending"
+            type="button"
+          >
+            Belum Selesai
+          </button>
+
+          <button
+            class="filter-button"
+            data-filter="completed"
+            type="button"
+          >
+            Selesai
+          </button>
+
+          <button
+            class="filter-button"
+            data-filter="priority"
+            type="button"
+          >
+            Prioritas
+          </button>
+
+        </div>
+
+
+
+        <div
+          id="allTaskList"
+          class="task-list"
+        >
+
+          <div
+            id="emptyAllState"
+            class="empty-state"
+          >
+
+            <div class="empty-icon">
+              📋
+            </div>
+
+            <h3>
+              Belum ada tugas
+            </h3>
+
+            <p>
+              Semua tugasmu akan muncul di sini.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================================
+           ADD TASK
+      ========================================== -->
+
+      <section
+        id="addPage"
+        class="page"
+        data-page="add"
+      >
+
+        <div class="page-header">
+
+          <div>
+
+            <h2>
+              Tambah Tugas
+            </h2>
+
+            <p>
+              Buat tugas baru dan atur waktunya.
+            </p>
 
           </div>
 
         </div>
 
 
-        <div class="stat-card">
 
-          <div class="stat-icon">
-            🔥
+        <form
+          id="taskForm"
+          class="task-form"
+        >
+
+
+          <div class="form-group">
+
+            <label for="taskTitle">
+              Nama Tugas
+            </label>
+
+            <input
+              type="text"
+              id="taskTitle"
+              name="taskTitle"
+              placeholder="Contoh: Mengerjakan tugas matematika"
+              required
+              maxlength="100"
+            >
+
           </div>
 
-          <div class="stat-info">
 
-            <span
-              id="priorityTaskCount"
-              class="stat-number"
+
+          <div class="form-group">
+
+            <label for="taskDescription">
+              Deskripsi
+            </label>
+
+            <textarea
+              id="taskDescription"
+              name="taskDescription"
+              placeholder="Tambahkan deskripsi tugas..."
+              rows="4"
+              maxlength="500"
+            ></textarea>
+
+          </div>
+
+
+
+          <div class="form-row">
+
+
+            <div class="form-group">
+
+              <label for="taskDate">
+                Tanggal
+              </label>
+
+              <input
+                type="date"
+                id="taskDate"
+                name="taskDate"
+                required
+              >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+              <label for="taskTime">
+                Waktu
+              </label>
+
+              <input
+                type="time"
+                id="taskTime"
+                name="taskTime"
+              >
+
+            </div>
+
+          </div>
+
+
+
+          <div class="form-group">
+
+            <label for="taskCategory">
+              Kategori
+            </label>
+
+            <select
+              id="taskCategory"
+              name="taskCategory"
             >
-              0
-            </span>
 
-            <span class="stat-label">
+              <option value="sekolah">
+                🏫 Sekolah
+              </option>
+
+              <option value="kuliah">
+                🎓 Kuliah
+              </option>
+
+              <option value="kerja">
+                💼 Kerja
+              </option>
+
+              <option value="pribadi">
+                👤 Pribadi
+              </option>
+
+              <option value="lainnya">
+                📌 Lainnya
+              </option>
+
+            </select>
+
+          </div>
+
+
+
+          <div class="form-group">
+
+            <label>
               Prioritas
-            </span>
+            </label>
+
+
+            <div class="priority-options">
+
+
+              <label class="priority-option">
+
+                <input
+                  type="radio"
+                  name="taskPriority"
+                  value="low"
+                  checked
+                >
+
+                <span>
+                  Rendah
+                </span>
+
+              </label>
+
+
+
+              <label class="priority-option">
+
+                <input
+                  type="radio"
+                  name="taskPriority"
+                  value="medium"
+                >
+
+                <span>
+                  Sedang
+                </span>
+
+              </label>
+
+
+
+              <label class="priority-option">
+
+                <input
+                  type="radio"
+                  name="taskPriority"
+                  value="high"
+                >
+
+                <span>
+                  Tinggi
+                </span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+
+          <div class="form-group">
+
+            <label class="checkbox-label">
+
+              <input
+                type="checkbox"
+                id="taskReminder"
+                name="taskReminder"
+              >
+
+              <span>
+                Aktifkan pengingat tugas
+              </span>
+
+            </label>
+
+          </div>
+
+
+
+          <div class="form-actions">
+
+            <button
+              type="reset"
+              id="resetTaskForm"
+              class="secondary-button"
+            >
+              Reset
+            </button>
+
+
+            <button
+              type="submit"
+              class="primary-button"
+            >
+              💾 Simpan Tugas
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+
+
+
+      <!-- =========================================
+           CALENDAR
+      ========================================== -->
+
+      <section
+        id="calendarPage"
+        class="page"
+        data-page="calendar"
+      >
+
+        <div class="page-header">
+
+          <div>
+
+            <h2>
+              Kalender
+            </h2>
+
+            <p>
+              Lihat jadwal tugas berdasarkan tanggal.
+            </p>
 
           </div>
 
         </div>
 
-      </div>
+
+
+        <div class="calendar-header">
+
+          <button
+            id="previousMonthButton"
+            class="icon-button"
+            type="button"
+          >
+            ‹
+          </button>
+
+
+          <h3 id="calendarMonth">
+            Bulan Tahun
+          </h3>
+
+
+          <button
+            id="nextMonthButton"
+            class="icon-button"
+            type="button"
+          >
+            ›
+          </button>
+
+        </div>
 
 
 
-      <!-- TODAY -->
+        <div
+          id="calendar"
+          class="calendar"
+        >
 
-      <div class="section-header">
+          <div class="calendar-weekdays">
 
-        <div>
+            <span>Min</span>
+            <span>Sen</span>
+            <span>Sel</span>
+            <span>Rab</span>
+            <span>Kam</span>
+            <span>Jum</span>
+            <span>Sab</span>
 
-          <h2>
-            Tugas Hari Ini
+          </div>
+
+
+          <div
+            id="calendarDays"
+            class="calendar-days"
+          >
+
+          </div>
+
+        </div>
+
+
+
+        <div class="selected-date-section">
+
+          <div class="section-header">
+
+            <div>
+
+              <h2 id="selectedDateTitle">
+                Jadwal
+              </h2>
+
+              <p>
+                Tugas pada tanggal yang dipilih.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="selectedDateTaskList"
+            class="task-list"
+          >
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================================
+           PROFILE
+      ========================================== -->
+
+      <section
+        id="profilePage"
+        class="page"
+        data-page="profile"
+      >
+
+
+        <div class="profile-card">
+
+          <div class="large-profile-avatar">
+
+            <span id="largeProfileInitial">
+              U
+            </span>
+
+          </div>
+
+
+          <h2 id="profileNameDisplay">
+            Pengguna TaskTime
           </h2>
 
-          <p>
-            Kelola tugas yang harus kamu selesaikan.
+
+          <p id="profileEmailDisplay">
+            Selamat datang di TaskTime
           </p>
 
         </div>
 
 
-        <button
-          id="quickAddButton"
-          class="text-button"
-          type="button"
-        >
-          + Tambah
-        </button>
 
-      </div>
+        <!-- PROFILE -->
 
+        <div class="settings-section">
 
-      <div
-        id="todayTaskList"
-        class="task-list"
-      ></div>
+          <h3>
+            Profil
+          </h3>
 
 
+          <div class="form-group">
 
-      <!-- UPCOMING -->
+            <label for="userName">
+              Nama
+            </label>
 
-      <div class="section-header upcoming-header">
+            <input
+              type="text"
+              id="userName"
+              placeholder="Masukkan nama kamu"
+              maxlength="50"
+            >
 
-        <div>
+          </div>
 
-          <h2>
-            Tugas Mendatang
-          </h2>
 
-          <p>
-            Jangan sampai lupa dengan tugasmu.
-          </p>
+          <button
+            id="saveProfileButton"
+            class="primary-button full"
+            type="button"
+          >
+            Simpan Profil
+          </button>
 
         </div>
 
 
-        <button
-          id="viewAllTasksButton"
-          class="text-button"
-          type="button"
-        >
-          Lihat Semua
-        </button>
 
-      </div>
+        <!-- NOTIFICATION -->
 
+        <div class="settings-section">
 
-      <div
-        id="upcomingTaskList"
-        class="task-list"
-      ></div>
-
-    </section>
+          <h3>
+            Notifikasi
+          </h3>
 
 
+          <div class="setting-item">
 
-    <!-- =======================================
-         ALL TASKS
-    ======================================= -->
+            <div>
 
-    <section
-      id="tasksPage"
-      class="page"
+              <strong>
+                Notifikasi Tugas
+              </strong>
+
+              <p>
+                Izinkan TaskTime mengirim pengingat.
+              </p>
+
+            </div>
+
+
+            <button
+              id="enableNotificationButton"
+              class="secondary-button"
+              type="button"
+            >
+              Aktifkan
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- INSTALL -->
+
+        <div class="settings-section">
+
+          <h3>
+            Aplikasi
+          </h3>
+
+          <p>
+            Install TaskTime agar dapat digunakan seperti aplikasi HP.
+          </p>
+
+
+          <button
+            id="installAppButton"
+            class="primary-button full"
+            type="button"
+          >
+            📲 Install TaskTime
+          </button>
+
+        </div>
+
+
+
+        <!-- DATA -->
+
+        <div class="settings-section">
+
+          <h3>
+            Data TaskTime
+          </h3>
+
+
+          <button
+            id="exportDataButton"
+            class="secondary-button full"
+            type="button"
+          >
+            📤 Export Data
+          </button>
+
+
+          <button
+            id="clearDataButton"
+            class="danger-button full"
+            type="button"
+          >
+            🗑️ Hapus Semua Data
+          </button>
+
+        </div>
+
+
+
+        <!-- ABOUT -->
+
+        <div class="about-card">
+
+          <div class="app-logo large">
+            ✓
+          </div>
+
+          <h3>
+            TaskTime
+          </h3>
+
+          <p>
+            Aplikasi sederhana untuk membantu mengatur tugas,
+            jadwal, dan aktivitas harian.
+          </p>
+
+          <small>
+            Versi 1.0.0
+          </small>
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+
+    <!-- =========================================
+         BOTTOM NAVIGATION
+    ========================================== -->
+
+    <nav
+      class="bottom-navigation"
+      id="bottomNavigation"
     >
 
-      <div class="page-header">
 
-        <div>
+      <button
+        class="nav-item active"
+        data-page="home"
+        type="button"
+      >
 
-          <h2>
-            Semua Tugas
-          </h2>
-
-          <p>
-            Kelola semua tugasmu di satu tempat.
-          </p>
-
-        </div>
-
-
-        <button
-          id="addTaskFromTasksPage"
-          class="primary-button small"
-          type="button"
-        >
-          + Tugas
-        </button>
-
-      </div>
-
-
-
-      <!-- SEARCH -->
-
-      <div class="search-box">
-
-        <span class="search-icon">
-          🔍
+        <span class="nav-icon">
+          🏠
         </span>
 
-        <input
-          id="taskSearchInput"
-          type="search"
-          placeholder="Cari tugas..."
-          autocomplete="off"
-        >
+        <span class="nav-label">
+          Beranda
+        </span>
+
+      </button>
+
+
+
+      <button
+        class="nav-item"
+        data-page="tasks"
+        type="button"
+      >
+
+        <span class="nav-icon">
+          📋
+        </span>
+
+        <span class="nav-label">
+          Tugas
+        </span>
+
+      </button>
+
+
+
+      <button
+        class="nav-add-button"
+        id="bottomAddButton"
+        type="button"
+        aria-label="Tambah tugas"
+      >
+
+        <span>
+          +
+        </span>
+
+      </button>
+
+
+
+      <button
+        class="nav-item"
+        data-page="calendar"
+        type="button"
+      >
+
+        <span class="nav-icon">
+          📅
+        </span>
+
+        <span class="nav-label">
+          Kalender
+        </span>
+
+      </button>
+
+
+
+      <button
+        class="nav-item"
+        data-page="profile"
+        type="button"
+      >
+
+        <span class="nav-icon">
+          👤
+        </span>
+
+        <span class="nav-label">
+          Profil
+        </span>
+
+      </button>
+
+    </nav>
+
+  </div>
+
+
+
+  <!-- =========================================
+       TASK DETAIL MODAL
+  ========================================== -->
+
+  <div
+    id="taskModal"
+    class="modal hidden"
+  >
+
+    <div class="modal-overlay"></div>
+
+
+    <div class="modal-content">
+
+
+      <div class="modal-header">
+
+        <h2>
+          Detail Tugas
+        </h2>
+
 
         <button
-          id="clearSearchButton"
+          id="closeTaskModal"
+          class="modal-close"
           type="button"
         >
           ✕
@@ -414,759 +1247,69 @@
       </div>
 
 
-
-      <!-- FILTER -->
-
-      <div class="filter-container">
-
-        <button
-          class="filter-button active"
-          data-filter="all"
-          type="button"
-        >
-          Semua
-        </button>
-
-        <button
-          class="filter-button"
-          data-filter="pending"
-          type="button"
-        >
-          Belum Selesai
-        </button>
-
-        <button
-          class="filter-button"
-          data-filter="completed"
-          type="button"
-        >
-          Selesai
-        </button>
-
-        <button
-          class="filter-button"
-          data-filter="priority"
-          type="button"
-        >
-          Prioritas
-        </button>
-
-      </div>
-
-
       <div
-        id="allTaskList"
-        class="task-list"
-      ></div>
-
-    </section>
-
-
-
-    <!-- =======================================
-         ADD TASK
-    ======================================= -->
-
-    <section
-      id="addPage"
-      class="page"
-    >
-
-      <div class="page-header">
-
-        <div>
-
-          <h2>
-            Tambah Tugas
-          </h2>
-
-          <p>
-            Buat tugas baru dan atur waktunya.
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <form
-        id="taskForm"
-        class="task-form"
+        id="taskModalContent"
+        class="modal-body"
       >
 
-
-        <div class="form-group">
-
-          <label for="taskTitle">
-            Nama Tugas
-          </label>
-
-          <input
-            id="taskTitle"
-            type="text"
-            placeholder="Contoh: Mengerjakan tugas matematika"
-            maxlength="100"
-            required
-          >
-
-        </div>
-
-
-
-        <div class="form-group">
-
-          <label for="taskDescription">
-            Deskripsi
-          </label>
-
-          <textarea
-            id="taskDescription"
-            rows="4"
-            maxlength="500"
-            placeholder="Tambahkan deskripsi tugas..."
-          ></textarea>
-
-        </div>
-
-
-
-        <div class="form-row">
-
-
-          <div class="form-group">
-
-            <label for="taskDate">
-              Tanggal
-            </label>
-
-            <input
-              id="taskDate"
-              type="date"
-              required
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="taskTime">
-              Waktu
-            </label>
-
-            <input
-              id="taskTime"
-              type="time"
-            >
-
-          </div>
-
-
-        </div>
-
-
-
-        <div class="form-group">
-
-          <label for="taskCategory">
-            Kategori
-          </label>
-
-          <select id="taskCategory">
-
-            <option value="sekolah">
-              🏫 Sekolah
-            </option>
-
-            <option value="kuliah">
-              🎓 Kuliah
-            </option>
-
-            <option value="kerja">
-              💼 Kerja
-            </option>
-
-            <option value="pribadi">
-              👤 Pribadi
-            </option>
-
-            <option value="lainnya">
-              📌 Lainnya
-            </option>
-
-          </select>
-
-        </div>
-
-
-
-        <div class="form-group">
-
-          <label>
-            Prioritas
-          </label>
-
-
-          <div class="priority-options">
-
-
-            <label class="priority-option">
-
-              <input
-                type="radio"
-                name="taskPriority"
-                value="low"
-                checked
-              >
-
-              <span>
-                Rendah
-              </span>
-
-            </label>
-
-
-            <label class="priority-option">
-
-              <input
-                type="radio"
-                name="taskPriority"
-                value="medium"
-              >
-
-              <span>
-                Sedang
-              </span>
-
-            </label>
-
-
-            <label class="priority-option">
-
-              <input
-                type="radio"
-                name="taskPriority"
-                value="high"
-              >
-
-              <span>
-                Tinggi
-              </span>
-
-            </label>
-
-
-          </div>
-
-        </div>
-
-
-
-        <div class="form-group">
-
-          <label class="checkbox-label">
-
-            <input
-              id="taskReminder"
-              type="checkbox"
-            >
-
-            <span>
-              Aktifkan pengingat tugas
-            </span>
-
-          </label>
-
-        </div>
-
-
-
-        <div class="form-actions">
-
-          <button
-            id="resetTaskForm"
-            class="secondary-button"
-            type="reset"
-          >
-            Reset
-          </button>
-
-
-          <button
-            class="primary-button"
-            type="submit"
-          >
-            💾 Simpan Tugas
-          </button>
-
-        </div>
-
-
-      </form>
-
-    </section>
-
-
-
-    <!-- =======================================
-         CALENDAR
-    ======================================= -->
-
-    <section
-      id="calendarPage"
-      class="page"
-    >
-
-      <div class="page-header">
-
-        <div>
-
-          <h2>
-            Kalender
-          </h2>
-
-          <p>
-            Lihat jadwal tugas berdasarkan tanggal.
-          </p>
-
-        </div>
-
       </div>
 
 
-
-      <div class="calendar-header">
-
+      <div class="modal-actions">
 
         <button
-          id="previousMonthButton"
-          class="icon-button"
+          id="completeTaskButton"
+          class="primary-button"
           type="button"
         >
-          ‹
-        </button>
-
-
-        <h3 id="calendarMonth">
-          Bulan Tahun
-        </h3>
-
-
-        <button
-          id="nextMonthButton"
-          class="icon-button"
-          type="button"
-        >
-          ›
-        </button>
-
-
-      </div>
-
-
-
-      <div class="calendar">
-
-
-        <div class="calendar-weekdays">
-
-          <span>
-            Min
-          </span>
-
-          <span>
-            Sen
-          </span>
-
-          <span>
-            Sel
-          </span>
-
-          <span>
-            Rab
-          </span>
-
-          <span>
-            Kam
-          </span>
-
-          <span>
-            Jum
-          </span>
-
-          <span>
-            Sab
-          </span>
-
-        </div>
-
-
-        <div
-          id="calendarDays"
-          class="calendar-days"
-        ></div>
-
-
-      </div>
-
-
-
-      <div class="selected-date-section">
-
-
-        <div class="section-header">
-
-          <div>
-
-            <h2 id="selectedDateTitle">
-              Jadwal
-            </h2>
-
-            <p>
-              Tugas pada tanggal yang dipilih.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div
-          id="selectedDateTaskList"
-          class="task-list"
-        ></div>
-
-
-      </div>
-
-
-    </section>
-
-
-
-    <!-- =======================================
-         PROFILE
-    ======================================= -->
-
-    <section
-      id="profilePage"
-      class="page"
-    >
-
-
-      <div class="profile-card">
-
-        <div class="large-profile-avatar">
-
-          <span id="largeProfileInitial">
-            U
-          </span>
-
-        </div>
-
-
-        <h2 id="profileNameDisplay">
-          Pengguna TaskTime
-        </h2>
-
-
-        <p>
-          Selamat datang di TaskTime
-        </p>
-
-      </div>
-
-
-
-      <!-- PROFILE -->
-
-      <div class="settings-section">
-
-        <h3>
-          Profil
-        </h3>
-
-
-        <div class="form-group">
-
-          <label for="userName">
-            Nama
-          </label>
-
-          <input
-            id="userName"
-            type="text"
-            maxlength="50"
-            placeholder="Masukkan nama kamu"
-          >
-
-        </div>
-
-
-        <button
-          id="saveProfileButton"
-          class="primary-button full"
-          type="button"
-        >
-          Simpan Profil
-        </button>
-
-      </div>
-
-
-
-      <!-- NOTIFICATION -->
-
-      <div class="settings-section">
-
-        <h3>
-          Notifikasi
-        </h3>
-
-
-        <div class="setting-item">
-
-          <div>
-
-            <strong>
-              Notifikasi Tugas
-            </strong>
-
-            <p>
-              Izinkan TaskTime mengirim pengingat.
-            </p>
-
-          </div>
-
-
-          <button
-            id="enableNotificationButton"
-            class="secondary-button"
-            type="button"
-          >
-            Aktifkan
-          </button>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- INSTALL -->
-
-      <div class="settings-section">
-
-        <h3>
-          Aplikasi
-        </h3>
-
-        <p>
-          Install TaskTime agar dapat digunakan seperti aplikasi HP.
-        </p>
-
-
-        <button
-          id="installAppButton"
-          class="primary-button full"
-          type="button"
-        >
-          📲 Install TaskTime
-        </button>
-
-      </div>
-
-
-
-      <!-- DATA -->
-
-      <div class="settings-section">
-
-        <h3>
-          Data TaskTime
-        </h3>
-
-
-        <button
-          id="exportDataButton"
-          class="secondary-button full"
-          type="button"
-        >
-          📤 Export Data
+          ✓ Tandai Selesai
         </button>
 
 
         <button
-          id="clearDataButton"
-          class="danger-button full"
+          id="editTaskButton"
+          class="secondary-button"
           type="button"
         >
-          🗑️ Hapus Semua Data
+          ✏️ Edit
+        </button>
+
+
+        <button
+          id="deleteTaskButton"
+          class="danger-button"
+          type="button"
+        >
+          🗑️ Hapus
         </button>
 
       </div>
 
+    </div>
 
-
-      <!-- ABOUT -->
-
-      <div class="about-card">
-
-        <div class="app-logo large">
-          ✓
-        </div>
-
-        <h3>
-          TaskTime
-        </h3>
-
-        <p>
-          Aplikasi sederhana untuk membantu mengatur tugas,
-          jadwal, dan aktivitas harian.
-        </p>
-
-        <small>
-          Versi 1.0.0
-        </small>
-
-      </div>
-
-
-    </section>
-
-
-  </main>
+  </div>
 
 
 
   <!-- =========================================
-       BOTTOM NAVIGATION
-  ========================================= -->
+       NOTIFICATION PANEL
+  ========================================== -->
 
-  <nav
-    id="bottomNavigation"
-    class="bottom-navigation"
+  <div
+    id="notificationPanel"
+    class="notification-panel hidden"
   >
 
 
-    <button
-      class="nav-item active"
-      data-page="home"
-      type="button"
-    >
+    <div class="notification-panel-header">
 
-      <span class="nav-icon">
-        🏠
-      </span>
-
-      <span class="nav-label">
-        Beranda
-      </span>
-
-    </button>
-
-
-
-    <button
-      class="nav-item"
-      data-page="tasks"
-      type="button"
-    >
-
-      <span class="nav-icon">
-        📋
-      </span>
-
-      <span class="nav-label">
-        Tugas
-      </span>
-
-    </button>
-
-
-
-    <button
-      id="bottomAddButton"
-      class="nav-add-button"
-      type="button"
-    >
-
-      <span>
-        +
-      </span>
-
-    </button>
-
-
-
-    <button
-      class="nav-item"
-      data-page="calendar"
-      type="button"
-    >
-
-      <span class="nav-icon">
-        📅
-      </span>
-
-      <span class="nav-label">
-        Kalender
-      </span>
-
-    </button>
-
-
-
-    <button
-      class="nav-item"
-      data-page="profile"
-      type="button"
-    >
-
-      <span class="nav-icon">
-        👤
-      </span>
-
-      <span class="nav-label">
-        Profil
-      </span>
-
-    </button>
-
-
-  </nav>
-
-
-</div>
-
-
-
-<!-- =========================================
-     TASK MODAL
-========================================= -->
-
-<div
-  id="taskModal"
-  class="modal hidden"
->
-
-
-  <div class="modal-overlay"></div>
-
-
-  <div class="modal-content">
-
-
-    <div class="modal-header">
-
-      <h2>
-        Detail Tugas
-      </h2>
+      <h3>
+        Notifikasi
+      </h3>
 
 
       <button
-        id="closeTaskModal"
-        class="modal-close"
+        id="closeNotificationPanel"
         type="button"
       >
         ✕
@@ -1176,341 +1319,523 @@
 
 
     <div
-      id="taskModalContent"
-      class="modal-body"
-    ></div>
+      id="notificationList"
+      class="notification-list"
+    >
 
+      <div class="empty-notification">
 
-    <div class="modal-actions">
+        <span>
+          🔔
+        </span>
 
+        <p>
+          Belum ada notifikasi.
+        </p>
 
-      <button
-        id="completeTaskButton"
-        class="primary-button"
-        type="button"
-      >
-        ✓ Tandai Selesai
-      </button>
-
-
-      <button
-        id="editTaskButton"
-        class="secondary-button"
-        type="button"
-      >
-        ✏️ Edit
-      </button>
-
-
-      <button
-        id="deleteTaskButton"
-        class="danger-button"
-        type="button"
-      >
-        🗑️ Hapus
-      </button>
-
+      </div>
 
     </div>
 
-
   </div>
 
-</div>
 
 
-
-<!-- =========================================
-     NOTIFICATION PANEL
-========================================= -->
-
-<div
-  id="notificationPanel"
-  class="notification-panel hidden"
->
-
-
-  <div class="notification-panel-header">
-
-    <h3>
-      Notifikasi
-    </h3>
-
-
-    <button
-      id="closeNotificationPanel"
-      type="button"
-    >
-      ✕
-    </button>
-
-  </div>
-
+  <!-- =========================================
+       TOAST
+  ========================================== -->
 
   <div
-    id="notificationList"
-    class="notification-list"
-  ></div>
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+  >
+
+    <span id="toastIcon">
+      ✓
+    </span>
 
 
-</div>
+    <span id="toastMessage">
+      Berhasil
+    </span>
 
-
-
-<!-- =========================================
-     TOAST
-========================================= -->
-
-<div
-  id="toast"
-  class="toast"
-  role="status"
-  aria-live="polite"
->
-
-  <span id="toastIcon">
-    ✓
-  </span>
-
-  <span id="toastMessage">
-    Berhasil
-  </span>
-
-</div>
-
-
-
-<!-- =========================================
-     OFFLINE INDICATOR
-========================================= -->
-
-<div
-  id="offlineIndicator"
-  class="offline-indicator hidden"
->
-
-  📡 Kamu sedang offline.
-
-</div>
-
-
-
-<!-- =========================================
-     LOADING
-========================================= -->
-
-<div
-  id="loadingScreen"
-  class="loading-screen"
->
-
-  <div class="loading-logo">
-    ✓
   </div>
 
-  <h2>
-    TaskTime
-  </h2>
-
-  <p>
-    Memuat aplikasi...
-  </p>
-
-  <div class="loading-spinner"></div>
-
-</div>
 
 
+  <!-- =========================================
+       OFFLINE
+  ========================================== -->
 
-<!-- =========================================
-     JAVASCRIPT
-========================================= -->
+  <div
+    id="offlineIndicator"
+    class="offline-indicator hidden"
+  >
 
-<script src="./script.js"></script>
+    📡 Kamu sedang offline.
+
+  </div>
 
 
 
-<!-- =========================================
-     SERVICE WORKER + PWA
-========================================= -->
+  <!-- =========================================
+       LOADING
+  ========================================== -->
 
-<script>
+  <div
+    id="loadingScreen"
+    class="loading-screen"
+  >
 
-  // Service Worker
-  if ("serviceWorker" in navigator) {
+    <div class="loading-logo">
+      ✓
+    </div>
+
+    <h2>
+      TaskTime
+    </h2>
+
+    <p>
+      Memuat aplikasi...
+    </p>
+
+    <div class="loading-spinner"></div>
+
+  </div>
+
+
+
+  <!-- =========================================
+       FIREBASE
+       FIREBASE APP + FCM
+  ========================================== -->
+
+  <script type="module">
+
+    import {
+      initializeApp
+    } from
+    "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+
+    import {
+      getMessaging,
+      getToken,
+      onMessage
+    } from
+    "https://www.gstatic.com/firebasejs/12.1.0/firebase-messaging.js";
+
+
+
+    /* =========================================
+       FIREBASE CONFIG
+    ========================================== */
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyCQuYr2-qUXwpL1ZI8cFOvAKMlbmgjX2d4",
+
+      authDomain:
+        "tasktime-e94d0.firebaseapp.com",
+
+      projectId:
+        "tasktime-e94d0",
+
+      storageBucket:
+        "tasktime-e94d0.firebasestorage.app",
+
+      messagingSenderId:
+        "32849434537",
+
+      appId:
+        "1:32849434537:web:5ac043cb375ffef93c96b8"
+
+    };
+
+
+
+    /* =========================================
+       INITIALIZE FIREBASE
+    ========================================== */
+
+    const firebaseApp =
+      initializeApp(
+        firebaseConfig
+      );
+
+
+
+    /* =========================================
+       INITIALIZE FIREBASE MESSAGING
+    ========================================== */
+
+    const messaging =
+      getMessaging(
+        firebaseApp
+      );
+
+
+
+    /* =========================================
+       VAPID KEY
+    ========================================== */
+
+    const VAPID_KEY =
+      "BOi9IDnr2wddmz0gEBwwgLL3JP0P9Gt4Rcj_tGwq2j0NlaMXLyCSsas74VaylpHs9IJh1U9XMqHi66eYTXA4fnc";
+
+
+
+    /* =========================================
+       SIMPAN FIREBASE KE WINDOW
+       AGAR SCRIPT.JS BISA MENGAKSESNYA
+    ========================================== */
+
+    window.taskTimeFirebase = {
+
+      app:
+        firebaseApp,
+
+      messaging:
+        messaging,
+
+      getToken:
+        getToken,
+
+      onMessage:
+        onMessage,
+
+      VAPID_KEY:
+        VAPID_KEY
+
+    };
+
+
+
+    /* =========================================
+       TERIMA NOTIFIKASI SAAT APLIKASI TERBUKA
+    ========================================== */
+
+    onMessage(
+      messaging,
+      function (payload) {
+
+        console.log(
+          "Pesan Firebase diterima:",
+          payload
+        );
+
+
+        const notification =
+          payload.notification || {};
+
+
+        const title =
+          notification.title ||
+          "TaskTime 🔔";
+
+
+        const body =
+          notification.body ||
+          "Kamu memiliki pengingat tugas.";
+
+
+        if (
+          typeof window.showToast ===
+          "function"
+        ) {
+
+          window.showToast(
+            "🔔",
+            body
+          );
+
+        }
+
+
+        /* Tambahkan ke notifikasi TaskTime */
+
+        if (
+          Array.isArray(
+            window.notifications
+          )
+        ) {
+
+          window.notifications.unshift({
+
+            id:
+              Date.now().toString(),
+
+            title:
+              title,
+
+            date:
+              new Date()
+                .toISOString()
+                .split("T")[0],
+
+            time:
+              new Date()
+                .toTimeString()
+                .slice(0, 5),
+
+            read:
+              false
+
+          });
+
+        }
+
+      }
+
+    );
+
+
+    console.log(
+      "Firebase TaskTime berhasil dimuat."
+    );
+
+  </script>
+
+
+
+  <!-- =========================================
+       TASKTIME SCRIPT
+  ========================================== -->
+
+  <script src="./script.js"></script>
+
+
+
+  <!-- =========================================
+       SERVICE WORKER
+  ========================================== -->
+
+  <script>
+
+    if (
+      "serviceWorker" in navigator
+    ) {
+
+      window.addEventListener(
+        "load",
+        function () {
+
+          navigator.serviceWorker
+            .register(
+              "./service-worker.js"
+            )
+
+            .then(
+              function (registration) {
+
+                console.log(
+                  "TaskTime Service Worker aktif:",
+                  registration.scope
+                );
+
+              }
+            )
+
+            .catch(
+              function (error) {
+
+                console.error(
+                  "Service Worker gagal:",
+                  error
+                );
+
+              }
+            );
+
+        }
+      );
+
+    }
+
+
+
+    /* =========================================
+       ONLINE / OFFLINE
+    ========================================== */
+
+    function updateConnectionStatus() {
+
+      const indicator =
+        document.getElementById(
+          "offlineIndicator"
+        );
+
+
+      if (!indicator) {
+        return;
+      }
+
+
+      if (
+        navigator.onLine
+      ) {
+
+        indicator.classList.add(
+          "hidden"
+        );
+
+      } else {
+
+        indicator.classList.remove(
+          "hidden"
+        );
+
+      }
+
+    }
+
+
+    window.addEventListener(
+      "online",
+      updateConnectionStatus
+    );
+
+
+    window.addEventListener(
+      "offline",
+      updateConnectionStatus
+    );
+
+
+    updateConnectionStatus();
+
+
+
+    /* =========================================
+       PWA INSTALL
+    ========================================== */
+
+    let deferredInstallPrompt =
+      null;
+
+
+    window.addEventListener(
+      "beforeinstallprompt",
+      function (event) {
+
+        event.preventDefault();
+
+
+        deferredInstallPrompt =
+          event;
+
+
+        const installButton =
+          document.getElementById(
+            "installAppButton"
+          );
+
+
+        if (installButton) {
+
+          installButton.style.display =
+            "block";
+
+        }
+
+      }
+    );
+
+
+
+    async function installTaskTime() {
+
+      if (
+        !deferredInstallPrompt
+      ) {
+
+        alert(
+          "TaskTime belum bisa di-install dari browser ini. " +
+          "Pastikan TaskTime dibuka melalui HTTPS dan " +
+          "manifest.json serta Service Worker sudah aktif."
+        );
+
+
+        return;
+
+      }
+
+
+      deferredInstallPrompt.prompt();
+
+
+      const result =
+        await deferredInstallPrompt.userChoice;
+
+
+      console.log(
+        "Hasil install:",
+        result.outcome
+      );
+
+
+      deferredInstallPrompt =
+        null;
+
+    }
+
+
+
+    const installButton =
+      document.getElementById(
+        "installAppButton"
+      );
+
+
+    if (installButton) {
+
+      installButton.addEventListener(
+        "click",
+        installTaskTime
+      );
+
+    }
+
+
+
+    /* =========================================
+       LOADING SCREEN
+    ========================================== */
 
     window.addEventListener(
       "load",
       function () {
 
-        navigator.serviceWorker
-          .register("./service-worker.js")
-          .then(function (registration) {
+        setTimeout(
+          function () {
 
-            console.log(
-              "TaskTime Service Worker aktif:",
-              registration.scope
-            );
-
-          })
-          .catch(function (error) {
-
-            console.error(
-              "Service Worker gagal:",
-              error
-            );
-
-          });
-
-      }
-    );
-
-  }
+            const loading =
+              document.getElementById(
+                "loadingScreen"
+              );
 
 
+            if (loading) {
 
-  // Status Online / Offline
+              loading.classList.add(
+                "hidden"
+              );
 
-  function updateConnectionStatus() {
+            }
 
-    const indicator =
-      document.getElementById(
-        "offlineIndicator"
-      );
-
-
-    if (!indicator) return;
-
-
-    if (navigator.onLine) {
-
-      indicator.classList.add(
-        "hidden"
-      );
-
-    } else {
-
-      indicator.classList.remove(
-        "hidden"
-      );
-
-    }
-
-  }
-
-
-  window.addEventListener(
-    "online",
-    updateConnectionStatus
-  );
-
-
-  window.addEventListener(
-    "offline",
-    updateConnectionStatus
-  );
-
-
-  updateConnectionStatus();
-
-
-
-  // PWA Install
-
-  let deferredInstallPrompt = null;
-
-
-  window.addEventListener(
-    "beforeinstallprompt",
-    function (event) {
-
-      event.preventDefault();
-
-      deferredInstallPrompt = event;
-
-    }
-  );
-
-
-  const installButton =
-    document.getElementById(
-      "installAppButton"
-    );
-
-
-  if (installButton) {
-
-    installButton.addEventListener(
-      "click",
-      async function () {
-
-        if (!deferredInstallPrompt) {
-
-          alert(
-            "TaskTime belum dapat di-install. " +
-            "Pastikan kamu membuka TaskTime melalui HTTPS."
-          );
-
-          return;
-
-        }
-
-
-        deferredInstallPrompt.prompt();
-
-
-        const result =
-          await deferredInstallPrompt.userChoice;
-
-
-        console.log(
-          "Install:",
-          result.outcome
+          },
+          500
         );
 
-
-        deferredInstallPrompt = null;
-
       }
     );
 
-  }
-
-
-
-  // Loading Screen
-
-  window.addEventListener(
-    "load",
-    function () {
-
-      setTimeout(
-        function () {
-
-          const loading =
-            document.getElementById(
-              "loadingScreen"
-            );
-
-
-          if (loading) {
-
-            loading.classList.add(
-              "hidden"
-            );
-
-          }
-
-        },
-        500
-      );
-
-    }
-  );
-
-</script>
+  </script>
 
 
 </body>
 
-</html>
+  </html>
