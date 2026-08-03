@@ -1,7 +1,7 @@
 /* =========================================
    TASKTIME - SCRIPT.JS
+   VERSI NOTIFIKASI CAPACITOR
    ========================================= */
-
 
 /* =========================================
    DATA STORAGE
@@ -21,42 +21,96 @@ let selectedTaskId = null;
 let currentCalendarDate = new Date();
 let selectedCalendarDate = new Date();
 
+let CapacitorLocalNotifications = null;
+
+
+/* =========================================
+   CAPACITOR LOCAL NOTIFICATIONS
+   ========================================= */
+
+async function initializeCapacitorNotifications() {
+
+    try {
+
+        if (
+            window.Capacitor &&
+            window.Capacitor.isNativePlatform()
+        ) {
+
+            const module =
+                await import(
+                    "@capacitor/local-notifications"
+                );
+
+            CapacitorLocalNotifications =
+                module.LocalNotifications;
+
+            console.log(
+                "Capacitor Local Notifications aktif."
+            );
+
+        } else {
+
+            console.log(
+                "TaskTime berjalan sebagai Web/PWA."
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Gagal memuat Local Notifications:",
+            error
+        );
+
+    }
+
+}
+
 
 /* =========================================
    INITIALIZATION
    ========================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
 
-    loadData();
+        await initializeCapacitorNotifications();
 
-    initializeNavigation();
+        loadData();
 
-    initializeTaskForm();
+        initializeNavigation();
 
-    initializeTaskFilters();
+        initializeTaskForm();
 
-    initializeSearch();
+        initializeTaskFilters();
 
-    initializeModal();
+        initializeSearch();
 
-    initializeCalendar();
+        initializeModal();
 
-    initializeProfile();
+        initializeCalendar();
 
-    initializeNotifications();
+        initializeProfile();
 
-    initializeButtons();
+        initializeNotifications();
 
-    updateAllUI();
+        initializeButtons();
 
-    setDefaultTaskDate();
+        updateAllUI();
 
-    updateGreeting();
+        setDefaultTaskDate();
 
-    console.log("TaskTime berhasil dimuat.");
+        updateGreeting();
 
-});
+        console.log(
+            "TaskTime berhasil dimuat."
+        );
+
+    }
+);
 
 
 /* =========================================
@@ -68,14 +122,22 @@ function loadData() {
     try {
 
         const savedTasks =
-            localStorage.getItem(STORAGE_KEY);
+            localStorage.getItem(
+                STORAGE_KEY
+            );
 
         const savedNotifications =
-            localStorage.getItem(NOTIFICATION_KEY);
+            localStorage.getItem(
+                NOTIFICATION_KEY
+            );
+
 
         if (savedTasks) {
 
-            tasks = JSON.parse(savedTasks);
+            tasks =
+                JSON.parse(
+                    savedTasks
+                );
 
         } else {
 
@@ -87,7 +149,9 @@ function loadData() {
         if (savedNotifications) {
 
             notifications =
-                JSON.parse(savedNotifications);
+                JSON.parse(
+                    savedNotifications
+                );
 
         } else {
 
@@ -147,21 +211,22 @@ function initializeNavigation() {
         );
 
 
-    navItems.forEach(function (button) {
+    navItems.forEach(
+        function (button) {
 
-        button.addEventListener(
-            "click",
-            function () {
+            button.addEventListener(
+                "click",
+                function () {
 
-                const page =
-                    this.dataset.page;
+                    navigateTo(
+                        this.dataset.page
+                    );
 
-                navigateTo(page);
+                }
+            );
 
-            }
-        );
-
-    });
+        }
+    );
 
 
     const bottomAddButton =
@@ -274,13 +339,15 @@ function navigateTo(pageName) {
         );
 
 
-    pages.forEach(function (page) {
+    pages.forEach(
+        function (page) {
 
-        page.classList.remove(
-            "active"
-        );
+            page.classList.remove(
+                "active"
+            );
 
-    });
+        }
+    );
 
 
     const targetPage =
@@ -304,24 +371,27 @@ function navigateTo(pageName) {
         );
 
 
-    navItems.forEach(function (item) {
+    navItems.forEach(
+        function (item) {
 
-        item.classList.remove(
-            "active"
-        );
-
-
-        if (
-            item.dataset.page === pageName
-        ) {
-
-            item.classList.add(
+            item.classList.remove(
                 "active"
             );
 
-        }
 
-    });
+            if (
+                item.dataset.page ===
+                pageName
+            ) {
+
+                item.classList.add(
+                    "active"
+                );
+
+            }
+
+        }
+    );
 
 
     window.scrollTo({
@@ -330,14 +400,20 @@ function navigateTo(pageName) {
     });
 
 
-    if (pageName === "calendar") {
+    if (
+        pageName ===
+        "calendar"
+    ) {
 
         renderCalendar();
 
     }
 
 
-    if (pageName === "profile") {
+    if (
+        pageName ===
+        "profile"
+    ) {
 
         loadProfile();
 
@@ -409,53 +485,45 @@ function setDefaultTaskDate() {
     if (!dateInput) return;
 
 
-    const today =
-        new Date();
-
-
     dateInput.value =
-        formatDateInput(today);
+        formatDateInput(
+            new Date()
+        );
 
 }
 
 
-function addTask() {
+async function addTask() {
 
     const titleInput =
         document.getElementById(
             "taskTitle"
         );
 
-
     const descriptionInput =
         document.getElementById(
             "taskDescription"
         );
-
 
     const dateInput =
         document.getElementById(
             "taskDate"
         );
 
-
     const timeInput =
         document.getElementById(
             "taskTime"
         );
-
 
     const categoryInput =
         document.getElementById(
             "taskCategory"
         );
 
-
     const reminderInput =
         document.getElementById(
             "taskReminder"
         );
-
 
     const priorityInput =
         document.querySelector(
@@ -463,7 +531,9 @@ function addTask() {
         );
 
 
-    if (!titleInput.value.trim()) {
+    if (
+        !titleInput.value.trim()
+    ) {
 
         showToast(
             "⚠️",
@@ -520,6 +590,23 @@ function addTask() {
 
     createTaskNotification(task);
 
+
+    /*
+     * Jadwalkan notifikasi Android
+     */
+
+    if (
+        task.reminder &&
+        task.time
+    ) {
+
+        await scheduleTaskNotification(
+            task
+        );
+
+    }
+
+
     formReset();
 
     updateAllUI();
@@ -534,6 +621,219 @@ function addTask() {
 
 }
 
+
+/* =========================================
+   SCHEDULE TASK NOTIFICATION
+   ========================================= */
+
+async function scheduleTaskNotification(
+    task
+) {
+
+    try {
+
+        const notificationId =
+            getNotificationId(
+                task.id
+            );
+
+
+        const date =
+            new Date(
+                `${task.date}T${task.time}:00`
+            );
+
+
+        if (
+            date.getTime() <=
+            Date.now()
+        ) {
+
+            console.log(
+                "Waktu tugas sudah lewat."
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * CAPACITOR ANDROID
+         */
+
+        if (
+            CapacitorLocalNotifications
+        ) {
+
+            await CapacitorLocalNotifications.schedule({
+
+                notifications: [
+
+                    {
+
+                        id:
+                            notificationId,
+
+                        title:
+                            "TaskTime ⏰",
+
+                        body:
+                            `Waktunya mengerjakan: ${task.title}`,
+
+                        schedule: {
+
+                            at:
+                                date
+
+                        },
+
+                        sound:
+                            "default",
+
+                        smallIcon:
+                            "ic_launcher",
+
+                        extra: {
+
+                            taskId:
+                                task.id
+
+                        }
+
+                    }
+
+                ]
+
+            });
+
+
+            console.log(
+                "Notifikasi berhasil dijadwalkan:",
+                task.title
+            );
+
+
+            return;
+
+        }
+
+
+        /*
+         * WEB / PWA
+         */
+
+        if (
+            "Notification" in window &&
+            Notification.permission ===
+            "granted"
+        ) {
+
+            console.log(
+                "Mode Web/PWA aktif."
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Gagal menjadwalkan notifikasi:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   CANCEL TASK NOTIFICATION
+   ========================================= */
+
+async function cancelTaskNotification(
+    taskId
+) {
+
+    try {
+
+        if (
+            !CapacitorLocalNotifications
+        ) {
+
+            return;
+
+        }
+
+
+        await CapacitorLocalNotifications.cancel({
+
+            notifications: [
+
+                {
+
+                    id:
+                        getNotificationId(
+                            taskId
+                        )
+
+                }
+
+            ]
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Gagal membatalkan notifikasi:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   NOTIFICATION ID
+   ========================================= */
+
+function getNotificationId(
+    taskId
+) {
+
+    let hash = 0;
+
+
+    for (
+        let i = 0;
+        i < taskId.length;
+        i++
+    ) {
+
+        hash =
+            (
+                (
+                    hash << 5
+                ) -
+                hash
+            ) +
+            taskId.charCodeAt(i);
+
+        hash |= 0;
+
+    }
+
+
+    return Math.abs(hash) || 1;
+
+}
+
+
+/* =========================================
+   FORM RESET
+   ========================================= */
 
 function formReset() {
 
@@ -554,7 +854,7 @@ function formReset() {
 
 
 /* =========================================
-   RENDER TASKS
+   RENDER ALL UI
    ========================================= */
 
 function updateAllUI() {
@@ -598,11 +898,16 @@ function renderTodayTasks() {
 
 
     const todayTasks =
-        tasks.filter(function (task) {
+        tasks.filter(
+            function (task) {
 
-            return task.date === today;
+                return (
+                    task.date ===
+                    today
+                );
 
-        });
+            }
+        );
 
 
     renderTaskCollection(
@@ -637,23 +942,30 @@ function renderUpcomingTasks() {
 
     const upcoming =
         tasks
-            .filter(function (task) {
+            .filter(
+                function (task) {
 
-                return (
-                    !task.completed &&
-                    task.date >= today
-                );
+                    return (
+                        !task.completed &&
+                        task.date >= today
+                    );
 
-            })
-            .sort(function (a, b) {
+                }
+            )
+            .sort(
+                function (a, b) {
 
-                return (
-                    getTaskDate(a) -
-                    getTaskDate(b)
-                );
+                    return (
+                        getTaskDate(a) -
+                        getTaskDate(b)
+                    );
 
-            })
-            .slice(0, 5);
+                }
+            )
+            .slice(
+                0,
+                5
+            );
 
 
     renderTaskCollection(
@@ -684,40 +996,56 @@ function renderAllTasks() {
         [...tasks];
 
 
-    if (currentFilter === "pending") {
+    if (
+        currentFilter ===
+        "pending"
+    ) {
 
         filtered =
-            filtered.filter(function (task) {
+            filtered.filter(
+                function (task) {
 
-                return !task.completed;
+                    return !task.completed;
 
-            });
+                }
+            );
 
     }
 
 
-    if (currentFilter === "completed") {
+    if (
+        currentFilter ===
+        "completed"
+    ) {
 
         filtered =
-            filtered.filter(function (task) {
+            filtered.filter(
+                function (task) {
 
-                return task.completed;
+                    return task.completed;
 
-            });
+                }
+            );
 
     }
 
 
-    if (currentFilter === "priority") {
+    if (
+        currentFilter ===
+        "priority"
+    ) {
 
         filtered =
-            filtered.filter(function (task) {
+            filtered.filter(
+                function (task) {
 
-                return (
-                    task.priority === "high"
-                );
+                    return (
+                        task.priority ===
+                        "high"
+                    );
 
-            });
+                }
+            );
 
     }
 
@@ -725,33 +1053,37 @@ function renderAllTasks() {
     if (currentSearch) {
 
         filtered =
-            filtered.filter(function (task) {
+            filtered.filter(
+                function (task) {
 
-                const text =
-                    (
-                        task.title +
-                        " " +
-                        task.description
-                    ).toLowerCase();
+                    const text =
+                        (
+                            task.title +
+                            " " +
+                            task.description
+                        ).toLowerCase();
 
 
-                return text.includes(
-                    currentSearch.toLowerCase()
-                );
+                    return text.includes(
+                        currentSearch.toLowerCase()
+                    );
 
-            });
+                }
+            );
 
     }
 
 
-    filtered.sort(function (a, b) {
+    filtered.sort(
+        function (a, b) {
 
-        return (
-            getTaskDate(a) -
-            getTaskDate(b)
-        );
+            return (
+                getTaskDate(a) -
+                getTaskDate(b)
+            );
 
-    });
+        }
+    );
 
 
     renderTaskCollection(
@@ -776,7 +1108,10 @@ function renderTaskCollection(
     container.innerHTML = "";
 
 
-    if (taskCollection.length === 0) {
+    if (
+        taskCollection.length ===
+        0
+    ) {
 
         const empty =
             document.createElement(
@@ -818,15 +1153,11 @@ function renderTaskCollection(
     taskCollection.forEach(
         function (task) {
 
-            const card =
+            container.appendChild(
                 createTaskCard(
                     task,
                     type
-                );
-
-
-            container.appendChild(
-                card
+                )
             );
 
         }
@@ -854,7 +1185,9 @@ function createTaskCard(
         "task-card";
 
 
-    if (task.completed) {
+    if (
+        task.completed
+    ) {
 
         card.classList.add(
             "completed"
@@ -903,14 +1236,12 @@ function createTaskCard(
 
             <button
                 class="check-button"
-                data-task-id="${task.id}"
                 type="button"
             >
                 ${task.completed ? "✓" : ""}
             </button>
 
         </div>
-
 
         <div class="task-content">
 
@@ -930,11 +1261,11 @@ function createTaskCard(
                 : ""
             }
 
-
             <div class="task-meta">
 
                 <span>
-                    📅 ${formatDisplayDate(
+                    📅
+                    ${formatDisplayDate(
                         task.date
                     )}
                 </span>
@@ -951,16 +1282,17 @@ function createTaskCard(
 
             </div>
 
-
             <div class="task-tags">
 
                 <span class="task-category">
+
                     ${
                         categoryText[
                             task.category
                         ] ||
                         "📌 Lainnya"
                     }
+
                 </span>
 
                 <span
@@ -969,9 +1301,13 @@ function createTaskCard(
                         priority-${task.priority}
                     "
                 >
-                    ${priorityText[
-                        task.priority
-                    ]}
+
+                    ${
+                        priorityText[
+                            task.priority
+                        ]
+                    }
+
                 </span>
 
                 ${
@@ -988,10 +1324,8 @@ function createTaskCard(
 
         </div>
 
-
         <button
             class="task-more-button"
-            data-task-detail="${task.id}"
             type="button"
         >
             ⋮
@@ -1061,14 +1395,21 @@ function createTaskCard(
    TOGGLE TASK
    ========================================= */
 
-function toggleTask(taskId) {
+async function toggleTask(
+    taskId
+) {
 
     const task =
-        tasks.find(function (item) {
+        tasks.find(
+            function (item) {
 
-            return item.id === taskId;
+                return (
+                    item.id ===
+                    taskId
+                );
 
-        });
+            }
+        );
 
 
     if (!task) return;
@@ -1078,12 +1419,34 @@ function toggleTask(taskId) {
         !task.completed;
 
 
+    if (
+        task.completed
+    ) {
+
+        await cancelTaskNotification(
+            task.id
+        );
+
+    } else if (
+        task.reminder &&
+        task.time
+    ) {
+
+        await scheduleTaskNotification(
+            task
+        );
+
+    }
+
+
     saveTasks();
 
     updateAllUI();
 
 
-    if (task.completed) {
+    if (
+        task.completed
+    ) {
 
         showToast(
             "🎉",
@@ -1160,11 +1523,13 @@ function initializeModal() {
 
         completeButton.addEventListener(
             "click",
-            function () {
+            async function () {
 
-                if (selectedTaskId) {
+                if (
+                    selectedTaskId
+                ) {
 
-                    toggleTask(
+                    await toggleTask(
                         selectedTaskId
                     );
 
@@ -1229,7 +1594,8 @@ function initializeModal() {
         function (event) {
 
             if (
-                event.key === "Escape"
+                event.key ===
+                "Escape"
             ) {
 
                 closeTaskModal();
@@ -1242,14 +1608,21 @@ function initializeModal() {
 }
 
 
-function openTaskModal(taskId) {
+function openTaskModal(
+    taskId
+) {
 
     const task =
-        tasks.find(function (item) {
+        tasks.find(
+            function (item) {
 
-            return item.id === taskId;
+                return (
+                    item.id ===
+                    taskId
+                );
 
-        });
+            }
+        );
 
 
     if (!task) return;
@@ -1271,7 +1644,10 @@ function openTaskModal(taskId) {
         );
 
 
-    if (!modal || !content) return;
+    if (
+        !modal ||
+        !content
+    ) return;
 
 
     content.innerHTML = `
@@ -1297,47 +1673,61 @@ function openTaskModal(taskId) {
             }
 
             <div class="detail-row">
+
                 📅
+
                 <strong>
                     ${formatDisplayDate(
                         task.date
                     )}
                 </strong>
+
             </div>
 
             ${
                 task.time
                 ? `
                     <div class="detail-row">
+
                         ⏰
+
                         <strong>
                             ${task.time}
                         </strong>
+
                     </div>
                   `
                 : ""
             }
 
             <div class="detail-row">
+
                 📂
+
                 <strong>
                     ${task.category}
                 </strong>
+
             </div>
 
             <div class="detail-row">
+
                 🔥
+
                 <strong>
                     ${task.priority}
                 </strong>
+
             </div>
 
             <div class="detail-row">
+
                 ${
                     task.completed
                     ? "✅ Tugas selesai"
                     : "⏳ Belum selesai"
                 }
+
             </div>
 
         </div>
@@ -1402,14 +1792,21 @@ function closeTaskModal() {
    DELETE TASK
    ========================================= */
 
-function deleteTask(taskId) {
+async function deleteTask(
+    taskId
+) {
 
     const task =
-        tasks.find(function (item) {
+        tasks.find(
+            function (item) {
 
-            return item.id === taskId;
+                return (
+                    item.id ===
+                    taskId
+                );
 
-        });
+            }
+        );
 
 
     if (!task) return;
@@ -1424,12 +1821,22 @@ function deleteTask(taskId) {
     if (!confirmed) return;
 
 
+    await cancelTaskNotification(
+        task.id
+    );
+
+
     tasks =
-        tasks.filter(function (item) {
+        tasks.filter(
+            function (item) {
 
-            return item.id !== taskId;
+                return (
+                    item.id !==
+                    taskId
+                );
 
-        });
+            }
+        );
 
 
     saveTasks();
@@ -1451,14 +1858,21 @@ function deleteTask(taskId) {
    EDIT TASK
    ========================================= */
 
-function editTask(taskId) {
+function editTask(
+    taskId
+) {
 
     const task =
-        tasks.find(function (item) {
+        tasks.find(
+            function (item) {
 
-            return item.id === taskId;
+                return (
+                    item.id ===
+                    taskId
+                );
 
-        });
+            }
+        );
 
 
     if (!task) return;
@@ -1616,26 +2030,32 @@ function updateStatistics() {
 
 
     const completed =
-        tasks.filter(function (task) {
+        tasks.filter(
+            function (task) {
 
-            return task.completed;
+                return task.completed;
 
-        }).length;
+            }
+        ).length;
 
 
     const pending =
-        total - completed;
+        total -
+        completed;
 
 
     const priority =
-        tasks.filter(function (task) {
+        tasks.filter(
+            function (task) {
 
-            return (
-                task.priority === "high" &&
-                !task.completed
-            );
+                return (
+                    task.priority ===
+                    "high" &&
+                    !task.completed
+                );
 
-        }).length;
+            }
+        ).length;
 
 
     setText(
@@ -1643,18 +2063,15 @@ function updateStatistics() {
         total
     );
 
-
     setText(
         "completedTaskCount",
         completed
     );
 
-
     setText(
         "pendingTaskCount",
         pending
     );
-
 
     setText(
         "priorityTaskCount",
@@ -1689,7 +2106,8 @@ function initializeCalendar() {
             function () {
 
                 currentCalendarDate.setMonth(
-                    currentCalendarDate.getMonth() - 1
+                    currentCalendarDate.getMonth() -
+                    1
                 );
 
                 renderCalendar();
@@ -1707,7 +2125,8 @@ function initializeCalendar() {
             function () {
 
                 currentCalendarDate.setMonth(
-                    currentCalendarDate.getMonth() + 1
+                    currentCalendarDate.getMonth() +
+                    1
                 );
 
                 renderCalendar();
@@ -1851,14 +2270,16 @@ function renderCalendar() {
 
 
         const hasTask =
-            tasks.some(function (task) {
+            tasks.some(
+                function (task) {
 
-                return (
-                    task.date ===
-                    dateString
-                );
+                    return (
+                        task.date ===
+                        dateString
+                    );
 
-            });
+                }
+            );
 
 
         if (hasTask) {
@@ -1870,14 +2291,11 @@ function renderCalendar() {
         }
 
 
-        const today =
+        if (
+            dateString ===
             formatDateInput(
                 new Date()
-            );
-
-
-        if (
-            dateString === today
+            )
         ) {
 
             dayElement.classList.add(
@@ -1893,7 +2311,6 @@ function renderCalendar() {
 
                 selectedCalendarDate =
                     date;
-
 
                 renderSelectedDateTasks();
 
@@ -1911,7 +2328,7 @@ function renderCalendar() {
 
 
 /* =========================================
-   SELECTED DATE TASKS
+   SELECTED DATE
    ========================================= */
 
 function renderSelectedDateTasks() {
@@ -1938,14 +2355,16 @@ function renderSelectedDateTasks() {
 
 
     const selectedTasks =
-        tasks.filter(function (task) {
+        tasks.filter(
+            function (task) {
 
-            return (
-                task.date ===
-                selectedDate
-            );
+                return (
+                    task.date ===
+                    selectedDate
+                );
 
-        });
+            }
+        );
 
 
     if (title) {
@@ -2159,74 +2578,154 @@ function initializeNotifications() {
                     );
 
 
-                panel.classList.add(
-                    "hidden"
-                );
+                if (panel) {
+
+                    panel.classList.add(
+                        "hidden"
+                    );
+
+                }
 
             }
         );
 
     }
 
-
-    checkScheduledNotifications();
-
-    setInterval(
-        checkScheduledNotifications,
-        30000
-    );
-
 }
 
+
+/* =========================================
+   REQUEST NOTIFICATION PERMISSION
+   ========================================= */
 
 async function requestNotificationPermission() {
 
-    if (
-        !("Notification" in window)
-    ) {
+    try {
+
+        /*
+         * ANDROID APK
+         */
+
+        if (
+            CapacitorLocalNotifications
+        ) {
+
+            const permission =
+                await CapacitorLocalNotifications.requestPermissions();
+
+
+            if (
+                permission.display ===
+                "granted"
+            ) {
+
+                showToast(
+                    "🔔",
+                    "Notifikasi berhasil diaktifkan."
+                );
+
+
+                await CapacitorLocalNotifications.createChannel({
+
+                    id:
+                        "tasktime-reminders",
+
+                    name:
+                        "Pengingat Tugas",
+
+                    description:
+                        "Notifikasi pengingat tugas TaskTime",
+
+                    importance:
+                        5,
+
+                    sound:
+                        "default",
+
+                    vibration:
+                        true
+
+                });
+
+
+            } else {
+
+                showToast(
+                    "⚠️",
+                    "Izin notifikasi belum diberikan."
+                );
+
+            }
+
+
+            return;
+
+        }
+
+
+        /*
+         * WEB / PWA
+         */
+
+        if (
+            !("Notification" in window)
+        ) {
+
+            showToast(
+                "❌",
+                "Browser tidak mendukung notifikasi."
+            );
+
+            return;
+
+        }
+
+
+        const permission =
+            await Notification.requestPermission();
+
+
+        if (
+            permission ===
+            "granted"
+        ) {
+
+            showToast(
+                "🔔",
+                "Notifikasi berhasil diaktifkan."
+            );
+
+
+            new Notification(
+                "TaskTime 🔔",
+                {
+
+                    body:
+                        "Notifikasi TaskTime sudah aktif."
+
+                }
+            );
+
+        } else {
+
+            showToast(
+                "⚠️",
+                "Izin notifikasi belum diberikan."
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Notifikasi error:",
+            error
+        );
+
 
         showToast(
             "❌",
-            "Browser tidak mendukung notifikasi."
-        );
-
-        return;
-
-    }
-
-
-    const permission =
-        await Notification.requestPermission();
-
-
-    if (
-        permission === "granted"
-    ) {
-
-        showToast(
-            "🔔",
-            "Notifikasi berhasil diaktifkan."
-        );
-
-
-        new Notification(
-            "TaskTime 🔔",
-            {
-
-                body:
-                    "Notifikasi TaskTime sudah aktif.",
-
-                icon:
-                    "./icon-192.png"
-
-            }
-        );
-
-    } else {
-
-        showToast(
-            "⚠️",
-            "Izin notifikasi belum diberikan."
+            "Gagal mengaktifkan notifikasi."
         );
 
     }
@@ -2234,7 +2733,13 @@ async function requestNotificationPermission() {
 }
 
 
-function createTaskNotification(task) {
+/* =========================================
+   CREATE NOTIFICATION HISTORY
+   ========================================= */
+
+function createTaskNotification(
+    task
+) {
 
     notifications.unshift({
 
@@ -2271,104 +2776,9 @@ function createTaskNotification(task) {
 }
 
 
-function checkScheduledNotifications() {
-
-    if (
-        !("Notification" in window)
-    ) {
-
-        return;
-
-    }
-
-
-    if (
-        Notification.permission !==
-        "granted"
-    ) {
-
-        return;
-
-    }
-
-
-    const now =
-        new Date();
-
-
-    tasks.forEach(
-        function (task) {
-
-            if (
-                task.completed ||
-                !task.reminder ||
-                !task.time
-            ) {
-
-                return;
-
-            }
-
-
-            const taskDate =
-                new Date(
-                    `${task.date}T${task.time}`
-                );
-
-
-            const difference =
-                taskDate.getTime() -
-                now.getTime();
-
-
-            const reminderWindow =
-                60 * 1000;
-
-
-            if (
-                difference >= 0 &&
-                difference <=
-                reminderWindow
-            ) {
-
-                const notificationKey =
-                    `notified_${task.id}_${task.date}_${task.time}`;
-
-
-                if (
-                    !localStorage.getItem(
-                        notificationKey
-                    )
-                ) {
-
-                    new Notification(
-                        "TaskTime ⏰",
-                        {
-
-                            body:
-                                `Waktunya mengerjakan: ${task.title}`,
-
-                            icon:
-                                "./icon-192.png"
-
-                        }
-                    );
-
-
-                    localStorage.setItem(
-                        notificationKey,
-                        "true"
-                    );
-
-                }
-
-            }
-
-        }
-    );
-
-}
-
+/* =========================================
+   NOTIFICATION BADGE
+   ========================================= */
 
 function updateNotificationBadge() {
 
@@ -2395,22 +2805,17 @@ function updateNotificationBadge() {
         unread;
 
 
-    if (
+    badge.style.display =
         unread > 0
-    ) {
-
-        badge.style.display =
-            "flex";
-
-    } else {
-
-        badge.style.display =
-            "none";
-
-    }
+        ? "flex"
+        : "none";
 
 }
 
+
+/* =========================================
+   RENDER NOTIFICATIONS
+   ========================================= */
 
 function renderNotifications() {
 
@@ -2427,7 +2832,8 @@ function renderNotifications() {
 
 
     if (
-        notifications.length === 0
+        notifications.length ===
+        0
     ) {
 
         container.innerHTML = `
@@ -2453,52 +2859,61 @@ function renderNotifications() {
 
 
     notifications
-        .slice(0, 20)
-        .forEach(function (notification) {
+        .slice(
+            0,
+            20
+        )
+        .forEach(
+            function (notification) {
 
-            const item =
-                document.createElement(
-                    "div"
+                const item =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                item.className =
+                    "notification-item";
+
+
+                item.innerHTML = `
+
+                    <span>
+                        🔔
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            ${escapeHTML(
+                                notification.title
+                            )}
+                        </strong>
+
+                        <small>
+                            ${formatDisplayDate(
+                                notification.date
+                            )}
+                        </small>
+
+                    </div>
+
+                `;
+
+
+                container.appendChild(
+                    item
                 );
 
-
-            item.className =
-                "notification-item";
-
-
-            item.innerHTML = `
-
-                <span>
-                    🔔
-                </span>
-
-                <div>
-
-                    <strong>
-                        ${escapeHTML(
-                            notification.title
-                        )}
-                    </strong>
-
-                    <small>
-                        ${formatDisplayDate(
-                            notification.date
-                        )}
-                    </small>
-
-                </div>
-
-            `;
-
-
-            container.appendChild(
-                item
-            );
-
-        });
+            }
+        );
 
 }
 
+
+/* =========================================
+   TOGGLE NOTIFICATION PANEL
+   ========================================= */
 
 function toggleNotificationPanel() {
 
@@ -2680,7 +3095,7 @@ function exportData() {
    CLEAR DATA
    ========================================= */
 
-function clearAllData() {
+async function clearAllData() {
 
     const confirmed =
         confirm(
@@ -2689,6 +3104,56 @@ function clearAllData() {
 
 
     if (!confirmed) return;
+
+
+    /*
+     * Batalkan semua notifikasi
+     */
+
+    if (
+        CapacitorLocalNotifications
+    ) {
+
+        try {
+
+            const pending =
+                await CapacitorLocalNotifications.getPending();
+
+
+            if (
+                pending.notifications.length
+            ) {
+
+                await CapacitorLocalNotifications.cancel({
+
+                    notifications:
+                        pending.notifications.map(
+                            function (item) {
+
+                                return {
+
+                                    id:
+                                        item.id
+
+                                };
+
+                            }
+                        )
+
+                });
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Gagal menghapus jadwal notifikasi:",
+                error
+            );
+
+        }
+
+    }
 
 
     tasks = [];
@@ -2847,7 +3312,9 @@ function showToast(
    DATE HELPERS
    ========================================= */
 
-function formatDateInput(date) {
+function formatDateInput(
+    date
+) {
 
     const year =
         date.getFullYear();
@@ -2913,11 +3380,16 @@ function formatDisplayDate(
 }
 
 
-function getTaskDate(task) {
+function getTaskDate(
+    task
+) {
 
     const date =
         new Date(
-            `${task.date}T${task.time || "00:00"}`
+            `${task.date}T${
+                task.time ||
+                "00:00"
+            }`
         );
 
 
@@ -2978,8 +3450,6 @@ setInterval(
     function () {
 
         updateGreeting();
-
-        checkScheduledNotifications();
 
     },
     60000
