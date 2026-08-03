@@ -44,7 +44,7 @@
 
 
   <!-- =========================================
-       PWA MANIFEST
+       PWA
   ========================================== -->
 
   <link
@@ -179,7 +179,7 @@
       >
 
 
-        <!-- WELCOME CARD -->
+        <!-- WELCOME -->
 
         <div class="welcome-card">
 
@@ -349,11 +349,38 @@
           class="task-list"
         >
 
+          <div
+            id="emptyTodayState"
+            class="empty-state"
+          >
+
+            <div class="empty-icon">
+              📝
+            </div>
+
+            <h3>
+              Belum ada tugas
+            </h3>
+
+            <p>
+              Tambahkan tugas pertamamu untuk hari ini.
+            </p>
+
+            <button
+              id="emptyAddTaskButton"
+              class="primary-button"
+              type="button"
+            >
+              + Tambah Tugas
+            </button>
+
+          </div>
+
         </div>
 
 
 
-        <!-- UPCOMING TASK -->
+        <!-- UPCOMING -->
 
         <div class="section-header upcoming-header">
 
@@ -500,6 +527,25 @@
           id="allTaskList"
           class="task-list"
         >
+
+          <div
+            id="emptyAllState"
+            class="empty-state"
+          >
+
+            <div class="empty-icon">
+              📋
+            </div>
+
+            <h3>
+              Belum ada tugas
+            </h3>
+
+            <p>
+              Semua tugasmu akan muncul di sini.
+            </p>
+
+          </div>
 
         </div>
 
@@ -890,13 +936,47 @@
       >
 
 
+        <!-- PROFILE CARD -->
+
         <div class="profile-card">
 
-          <div class="large-profile-avatar">
+
+          <!-- AVATAR -->
+
+          <div
+            class="large-profile-avatar"
+            id="profileAvatarContainer"
+          >
+
+            <img
+              id="profileAvatarImage"
+              src=""
+              alt="Foto Profil"
+              style="display: none;"
+            >
 
             <span id="largeProfileInitial">
               U
             </span>
+
+
+            <!-- UPLOAD FOTO -->
+
+            <label
+              for="profilePhotoInput"
+              class="profile-photo-button"
+              title="Ganti foto profil"
+            >
+              📷
+            </label>
+
+
+            <input
+              type="file"
+              id="profilePhotoInput"
+              accept="image/*"
+              hidden
+            >
 
           </div>
 
@@ -989,7 +1069,7 @@
 
 
 
-        <!-- INSTALL -->
+        <!-- INSTALL APP -->
 
         <div class="settings-section">
 
@@ -1369,6 +1449,7 @@
 
   <!-- =========================================
        FIREBASE
+       FIREBASE APP + FCM
   ========================================== -->
 
   <script type="module">
@@ -1415,14 +1496,6 @@
 
 
     /* =========================================
-       VAPID KEY
-    ========================================== */
-
-    const VAPID_KEY =
-      "BOi9IDnr2wddmz0gEBwwgLL3JP0P9Gt4Rcj_tGwq2j0NlaMXLyCSsas74VaylpHs9IJh1U9XMqHi66eYTXA4fnc";
-
-
-    /* =========================================
        INITIALIZE FIREBASE
     ========================================== */
 
@@ -1436,31 +1509,22 @@
        INITIALIZE MESSAGING
     ========================================== */
 
-    let messaging = null;
-
-    try {
-
-      messaging =
-        getMessaging(
-          firebaseApp
-        );
-
-      console.log(
-        "Firebase Cloud Messaging siap."
+    const messaging =
+      getMessaging(
+        firebaseApp
       );
-
-    } catch (error) {
-
-      console.error(
-        "Firebase Messaging tidak tersedia:",
-        error
-      );
-
-    }
 
 
     /* =========================================
-       GLOBAL FIREBASE OBJECT
+       VAPID KEY
+    ========================================== */
+
+    const VAPID_KEY =
+      "BOi9IDnr2wddmz0gEBwwgLL3JP0P9Gt4Rcj_tGwq2j0NlaMXLyCSsas74VaylpHs9IJh1U9XMqHi66eYTXA4fnc";
+
+
+    /* =========================================
+       SIMPAN FIREBASE KE WINDOW
     ========================================== */
 
     window.taskTimeFirebase = {
@@ -1484,132 +1548,83 @@
 
 
     /* =========================================
-       FOREGROUND MESSAGE
+       FOREGROUND NOTIFICATION
     ========================================== */
 
-    if (messaging) {
+    onMessage(
+      messaging,
+      function (payload) {
 
-      onMessage(
-        messaging,
-        function (payload) {
+        console.log(
+          "Pesan Firebase diterima:",
+          payload
+        );
 
-          console.log(
-            "Firebase message diterima:",
-            payload
+
+        const notification =
+          payload.notification || {};
+
+
+        const title =
+          notification.title ||
+          "TaskTime 🔔";
+
+
+        const body =
+          notification.body ||
+          "Kamu memiliki pengingat tugas.";
+
+
+        if (
+          typeof window.showToast ===
+          "function"
+        ) {
+
+          window.showToast(
+            "🔔",
+            body
           );
 
-
-          const notification =
-            payload.notification ||
-            {};
+        }
 
 
-          const title =
-            notification.title ||
-            "TaskTime 🔔";
+        if (
+          Array.isArray(
+            window.notifications
+          )
+        ) {
 
+          window.notifications.unshift({
 
-          const body =
-            notification.body ||
-            "Kamu memiliki pengingat tugas.";
+            id:
+              Date.now().toString(),
 
+            title:
+              title,
 
-          /* Toast */
+            date:
+              new Date()
+                .toISOString()
+                .split("T")[0],
 
-          if (
-            typeof window.showToast ===
-            "function"
-          ) {
+            time:
+              new Date()
+                .toTimeString()
+                .slice(0, 5),
 
-            window.showToast(
-              "🔔",
-              body
-            );
+            read:
+              false
 
-          }
-
-
-          /* Simpan notifikasi lokal */
-
-          try {
-
-            const saved =
-              localStorage.getItem(
-                "tasktime_notifications"
-              );
-
-
-            let notificationList =
-              saved
-              ? JSON.parse(saved)
-              : [];
-
-
-            notificationList.unshift({
-
-              id:
-                Date.now().toString(),
-
-              title:
-                title,
-
-              date:
-                new Date()
-                  .toISOString()
-                  .split("T")[0],
-
-              time:
-                new Date()
-                  .toTimeString()
-                  .slice(0, 5),
-
-              read:
-                false
-
-            });
-
-
-            notificationList =
-              notificationList.slice(
-                0,
-                50
-              );
-
-
-            localStorage.setItem(
-              "tasktime_notifications",
-              JSON.stringify(
-                notificationList
-              )
-            );
-
-
-            if (
-              typeof window.updateAllUI ===
-              "function"
-            ) {
-
-              window.updateAllUI();
-
-            }
-
-          } catch (error) {
-
-            console.error(
-              "Gagal menyimpan notifikasi:",
-              error
-            );
-
-          }
+          });
 
         }
-      );
 
-    }
+      }
+    );
 
 
     console.log(
-      "TaskTime Firebase berhasil dimuat."
+      "Firebase TaskTime berhasil dimuat."
     );
 
   </script>
@@ -1671,7 +1686,6 @@
     }
 
 
-
     /* =========================================
        ONLINE / OFFLINE
     ========================================== */
@@ -1685,9 +1699,7 @@
 
 
       if (!indicator) {
-
         return;
-
       }
 
 
@@ -1740,7 +1752,6 @@
 
         event.preventDefault();
 
-
         deferredInstallPrompt =
           event;
 
@@ -1753,14 +1764,14 @@
 
         if (installButton) {
 
-          installButton.style.display =
-            "block";
+          installButton.classList.add(
+            "show"
+          );
 
         }
 
       }
     );
-
 
 
     async function installTaskTime() {
@@ -1774,7 +1785,6 @@
           "Pastikan TaskTime dibuka melalui HTTPS dan " +
           "manifest.json serta Service Worker sudah aktif."
         );
-
 
         return;
 
@@ -1800,7 +1810,6 @@
     }
 
 
-
     const installButton =
       document.getElementById(
         "installAppButton"
@@ -1815,6 +1824,172 @@
       );
 
     }
+
+
+
+    /* =========================================
+       PROFILE PHOTO
+    ========================================== */
+
+    const profilePhotoInput =
+      document.getElementById(
+        "profilePhotoInput"
+      );
+
+
+    const profileAvatarImage =
+      document.getElementById(
+        "profileAvatarImage"
+      );
+
+
+    const largeProfileInitial =
+      document.getElementById(
+        "largeProfileInitial"
+      );
+
+
+    const profileInitial =
+      document.getElementById(
+        "profileInitial"
+      );
+
+
+    function applyProfilePhoto(
+      imageData
+    ) {
+
+      if (!imageData) {
+        return;
+      }
+
+
+      if (profileAvatarImage) {
+
+        profileAvatarImage.src =
+          imageData;
+
+        profileAvatarImage.style.display =
+          "block";
+
+      }
+
+
+      if (largeProfileInitial) {
+
+        largeProfileInitial.style.display =
+          "none";
+
+      }
+
+
+      if (profileInitial) {
+
+        profileInitial.style.display =
+          "none";
+
+      }
+
+    }
+
+
+    function loadProfilePhoto() {
+
+      const savedPhoto =
+        localStorage.getItem(
+          "tasktime_profile_photo"
+        );
+
+
+      if (savedPhoto) {
+
+        applyProfilePhoto(
+          savedPhoto
+        );
+
+      }
+
+    }
+
+
+    if (profilePhotoInput) {
+
+      profilePhotoInput.addEventListener(
+        "change",
+        function (event) {
+
+          const file =
+            event.target.files?.[0];
+
+
+          if (!file) {
+            return;
+          }
+
+
+          if (
+            !file.type.startsWith(
+              "image/"
+            )
+          ) {
+
+            alert(
+              "File harus berupa gambar."
+            );
+
+            return;
+
+          }
+
+
+          const reader =
+            new FileReader();
+
+
+          reader.onload =
+            function () {
+
+              const imageData =
+                reader.result;
+
+
+              localStorage.setItem(
+                "tasktime_profile_photo",
+                imageData
+              );
+
+
+              applyProfilePhoto(
+                imageData
+              );
+
+
+              if (
+                typeof window.showToast ===
+                "function"
+              ) {
+
+                window.showToast(
+                  "✓",
+                  "Foto profil berhasil diperbarui."
+                );
+
+              }
+
+            };
+
+
+          reader.readAsDataURL(
+            file
+          );
+
+        }
+      );
+
+    }
+
+
+    loadProfilePhoto();
 
 
 
@@ -1855,4 +2030,4 @@
 
 </body>
 
-        </html>
+  </html>
