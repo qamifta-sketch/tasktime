@@ -1,294 +1,210 @@
- /* =========================================
-   TASKTIME - SERVICE WORKER
-   PWA + OFFLINE + PUSH NOTIFICATION
-========================================= */
-
-
-/* =========================================
-   CACHE
-========================================= */
-
 const CACHE_NAME = "tasktime-v2";
-
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
   "./style.css",
   "./script.js",
-  "./manifest.json"
+  "./manifest.json",
+  "./icon-192.png"
 ];
-
-
 
 /* =========================================
    INSTALL
 ========================================= */
 
-self.addEventListener(
-  "install",
-  function (event) {
+self.addEventListener("install", (event) => {
 
-    console.log(
-      "TaskTime Service Worker: Install"
-    );
+  event.waitUntil(
 
+    caches.open(CACHE_NAME)
 
-    event.waitUntil(
+      .then((cache) => {
 
-      caches
-        .open(CACHE_NAME)
+        return cache.addAll(FILES_TO_CACHE);
 
-        .then(
-          function (cache) {
+      })
 
-            return cache.addAll(
-              FILES_TO_CACHE
-            );
+      .then(() => {
 
-          }
-        )
+        return self.skipWaiting();
 
-        .then(
-          function () {
+      })
 
-            return self.skipWaiting();
+  );
 
-          }
-        )
-
-    );
-
-  }
-);
-
+});
 
 
 /* =========================================
    ACTIVATE
 ========================================= */
 
-self.addEventListener(
-  "activate",
-  function (event) {
+self.addEventListener("activate", (event) => {
 
-    console.log(
-      "TaskTime Service Worker: Aktif"
-    );
+  event.waitUntil(
 
+    caches.keys()
 
-    event.waitUntil(
+      .then((cacheNames) => {
 
-      caches
-        .keys()
+        return Promise.all(
 
-        .then(
-          function (cacheNames) {
+          cacheNames
 
-            return Promise.all(
+            .filter((name) => {
 
-              cacheNames
+              return name !== CACHE_NAME;
 
-                .filter(
-                  function (name) {
+            })
 
-                    return (
-                      name !== CACHE_NAME
-                    );
+            .map((name) => {
 
-                  }
-                )
+              return caches.delete(name);
 
-                .map(
-                  function (name) {
+            })
 
-                    return caches.delete(
-                      name
-                    );
+        );
 
-                  }
-                )
+      })
 
-            );
+      .then(() => {
 
-          }
-        )
+        return self.clients.claim();
 
-        .then(
-          function () {
+      })
 
-            return self.clients.claim();
+  );
 
-          }
-        )
-
-    );
-
-  }
-);
-
+});
 
 
 /* =========================================
-   FETCH / OFFLINE
+   OFFLINE / CACHE
 ========================================= */
 
-self.addEventListener(
-  "fetch",
-  function (event) {
+self.addEventListener("fetch", (event) => {
 
-    event.respondWith(
+  event.respondWith(
 
-      caches
-        .match(event.request)
+    caches.match(event.request)
 
-        .then(
-          function (cachedResponse) {
+      .then((response) => {
 
-            if (cachedResponse) {
+        if (response) {
 
-              return cachedResponse;
-
-            }
-
-
-            return fetch(
-              event.request
-            )
-
-            .then(
-              function (networkResponse) {
-
-                return networkResponse;
-
-              }
-            )
-
-            .catch(
-              function () {
-
-                return caches.match(
-                  "./index.html"
-                );
-
-              }
-            );
-
-          }
-        )
-
-    );
-
-  }
-);
-
-
-
-/* =========================================
-   PUSH NOTIFICATION
-========================================= */
-
-self.addEventListener(
-  "push",
-  function (event) {
-
-    let notificationData = {
-
-      title:
-        "TaskTime 🔔",
-
-      body:
-        "Kamu memiliki pengingat tugas.",
-
-      icon:
-        "./icon-192.png",
-
-      badge:
-        "./icon-192.png",
-
-      url:
-        "./"
-
-    };
-
-
-
-    /* Jika ada data dari Push Server */
-
-    if (event.data) {
-
-      try {
-
-        const receivedData =
-          event.data.json();
-
-
-        notificationData = {
-
-          ...notificationData,
-
-          ...receivedData
-
-        };
-
-      }
-
-      catch (error) {
-
-        notificationData.body =
-          event.data.text();
-
-      }
-
-    }
-
-
-
-    /* Tampilkan notifikasi */
-
-    event.waitUntil(
-
-      self.registration.showNotification(
-
-        notificationData.title,
-
-        {
-
-          body:
-            notificationData.body,
-
-          icon:
-            notificationData.icon,
-
-          badge:
-            notificationData.badge,
-
-          vibrate:
-            [200, 100, 200],
-
-          tag:
-            "tasktime-notification",
-
-          renotify:
-            true,
-
-          data: {
-
-            url:
-              notificationData.url ||
-              "./"
-
-          }
+          return response;
 
         }
 
-      )
+        return fetch(event.request);
 
-    );
+      })
+
+  );
+
+});
+
+
+/* =========================================
+   FIREBASE CLOUD MESSAGING
+   PUSH NOTIFICATION
+========================================= */
+
+self.addEventListener("push", (event) => {
+
+  let data = {
+
+    title: "TaskTime 🔔",
+
+    body: "Kamu memiliki pengingat tugas.",
+
+    icon: "./icon-192.png",
+
+    badge: "./icon-192.png",
+
+    url: "./"
+
+  };
+
+
+  /*
+
+    Membaca data dari Firebase
+
+  */
+
+  if (event.data) {
+
+    try {
+
+      const pushData =
+        event.data.json();
+
+
+      data = {
+
+        ...data,
+
+        ...pushData
+
+      };
+
+    }
+
+    catch (error) {
+
+      data.body =
+        event.data.text();
+
+    }
 
   }
-);
 
+
+  const notificationOptions = {
+
+    body:
+      data.body,
+
+    icon:
+      data.icon ||
+      "./icon-192.png",
+
+    badge:
+      data.badge ||
+      "./icon-192.png",
+
+    vibrate:
+      [200, 100, 200],
+
+    requireInteraction:
+      false,
+
+    data: {
+
+      url:
+        data.url ||
+        "./"
+
+    }
+
+  };
+
+
+  event.waitUntil(
+
+    self.registration.showNotification(
+
+      data.title,
+
+      notificationOptions
+
+    )
+
+  );
+
+});
 
 
 /* =========================================
@@ -297,12 +213,13 @@ self.addEventListener(
 
 self.addEventListener(
   "notificationclick",
-  function (event) {
+  (event) => {
 
     event.notification.close();
 
 
-    const targetUrl =
+    const urlToOpen =
+
       event.notification.data &&
       event.notification.data.url
 
@@ -311,97 +228,64 @@ self.addEventListener(
         : "./";
 
 
-
     event.waitUntil(
 
-      clients
-        .matchAll({
+      clients.matchAll({
 
-          type:
-            "window",
+        type:
+          "window",
 
-          includeUncontrolled:
-            true
+        includeUncontrolled:
+          true
 
-        })
+      })
 
-        .then(
-          function (clientList) {
+      .then((clientList) => {
 
 
-            /* Cari TaskTime yang sudah terbuka */
+        /*
 
-            for (
-              const client
-              of clientList
-            ) {
+          Jika TaskTime sudah terbuka,
+          fokuskan aplikasi.
 
-              if (
-                client.url.includes(
-                  "github.io"
-                ) &&
-                "focus" in client
-              ) {
+        */
 
-                return client.focus();
+        for (
+          const client of clientList
+        ) {
 
-              }
+          if (
+            "focus" in client
+          ) {
 
-            }
-
-
-
-            /* Kalau belum terbuka,
-               buka TaskTime */
-
-            if (
-              clients.openWindow
-            ) {
-
-              return clients.openWindow(
-                targetUrl
-              );
-
-            }
+            return client.focus();
 
           }
-        )
+
+        }
+
+
+        /*
+
+          Jika belum terbuka,
+          buka TaskTime.
+
+        */
+
+        if (
+          clients.openWindow
+        ) {
+
+          return clients.openWindow(
+            urlToOpen
+          );
+
+        }
+
+      })
 
     );
 
   }
-);
 
-
-
-/* =========================================
-   MESSAGE
-   Komunikasi dengan script.js
-========================================= */
-
-self.addEventListener(
-  "message",
-  function (event) {
-
-    if (
-      event.data &&
-      event.data.type ===
-      "SKIP_WAITING"
-    ) {
-
-      self.skipWaiting();
-
-    }
-
-  }
-);
-
-
-
-/* =========================================
-   END SERVICE WORKER
-========================================= */
-
-console.log(
-  "TaskTime Service Worker siap."
 );
