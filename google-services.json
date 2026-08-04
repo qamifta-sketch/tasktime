@@ -1,1 +1,29 @@
-
+{
+  "project_info": {
+    "project_number": "32849434537",
+    "project_id": "tasktime-e94d0",
+    "storage_bucket": "tasktime-e94d0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32849434537:android:af4ff86655f377783c96b8",
+        "android_client_info": {
+          "package_name": "com.tasktime.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6qzf_i5Hzqm_21s2Ktaec82Kfc-pTfUc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
