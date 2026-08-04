@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
 
 jobs:
@@ -12,59 +13,129 @@ jobs:
 
     steps:
 
-      # 1. Ambil semua file dari repository
+      # =========================================
+      # 1. Checkout Repository
+      # =========================================
       - name: Checkout repository
         uses: actions/checkout@v4
 
+
+      # =========================================
       # 2. Setup Node.js
+      # =========================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
+
+      # =========================================
       # 3. Install Capacitor
-      - name: Install dependencies
+      # =========================================
+      - name: Install Capacitor
         run: |
           npm install @capacitor/core
           npm install @capacitor/cli
           npm install @capacitor/android
 
-      # 4. Buat konfigurasi Capacitor
+
+      # =========================================
+      # 4. Create Capacitor Config
+      # =========================================
       - name: Create Capacitor config
         run: |
           npx cap init TaskTime com.tasktime.app --web-dir www
 
-      # 5. Siapkan semua file website
+
+      # =========================================
+      # 5. Prepare Website Files
+      # =========================================
       - name: Prepare web files
         run: |
           mkdir -p www
+
           cp index.html www/index.html
           cp style.css www/style.css
           cp script.js www/script.js
           cp manifest.json www/manifest.json
-          cp service-worker.js www/service-worker.js
 
-      # 6. Tambahkan Android
+          if [ -f service-worker.js ]; then
+            cp service-worker.js www/service-worker.js
+          fi
+
+          if [ -f firebase-messaging-sw.js ]; then
+            cp firebase-messaging-sw.js www/firebase-messaging-sw.js
+          fi
+
+
+      # =========================================
+      # 6. Add Android Platform
+      # =========================================
       - name: Add Android
-        run: npx cap add android
+        run: |
+          npx cap add android
 
-      # 7. Salin file website ke Android
-      - name: Copy web files
-        run: npx cap copy android
 
-      # 8. Setup Java 21
+      # =========================================
+      # 7. Copy Firebase Configuration
+      # =========================================
+      - name: Copy google-services.json
+        run: |
+          if [ ! -f google-services.json ]; then
+            echo "ERROR: google-services.json tidak ditemukan!"
+            exit 1
+          fi
+
+          cp google-services.json android/app/google-services.json
+
+
+      # =========================================
+      # 8. Install Firebase Capacitor Push Notifications
+      # =========================================
+      - name: Install Capacitor Push Notifications
+        run: |
+          npm install @capacitor/push-notifications
+
+
+      # =========================================
+      # 9. Sync Capacitor
+      # =========================================
+      - name: Sync Capacitor
+        run: |
+          npx cap sync android
+
+
+      # =========================================
+      # 10. Setup Java 21
+      # =========================================
       - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+          cache: gradle
 
-      # 9. Build APK
+
+      # =========================================
+      # 11. Make Gradle Executable
+      # =========================================
+      - name: Make Gradle executable
+        run: |
+          chmod +x android/gradlew
+
+
+      # =========================================
+      # 12. Build Debug APK
+      # =========================================
       - name: Build APK
         working-directory: android
-        run: ./gradlew assembleDebug
+        run: |
+          ./gradlew assembleDebug
 
-      # 10. Upload APK
+
+      # =========================================
+      # 13. Upload APK
+      # =========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
