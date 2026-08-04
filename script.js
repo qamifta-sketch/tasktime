@@ -1,9 +1,10 @@
- /* =========================================================
+/* =========================================================
    TASKTIME — SCRIPT.JS
    FULL VERSION
    ========================================================= */
 
 "use strict";
+
 
 /* =========================================================
    GLOBAL DATA
@@ -22,21 +23,33 @@ let selectedCalendarDate = new Date();
 
 let deferredInstallPrompt = null;
 
+let toastTimeout = null;
+
+let reminderInterval = null;
+
 
 /* =========================================================
-   LOCAL STORAGE
+   LOCAL STORAGE KEYS
    ========================================================= */
 
-const TASKS_KEY = "taskTimeTasks";
-const NOTIFICATIONS_KEY = "taskTimeNotifications";
-const PROFILE_KEY = "taskTimeProfile";
-const FCM_TOKEN_KEY = "taskTimeFCMToken";
+const TASKS_KEY =
+  "taskTimeTasks";
+
+const NOTIFICATIONS_KEY =
+  "taskTimeNotifications";
+
+const PROFILE_KEY =
+  "taskTimeProfile";
+
+const FCM_TOKEN_KEY =
+  "taskTimeFCMToken";
+
 const NOTIFICATION_ENABLED_KEY =
   "taskTimeNotificationEnabled";
 
 
 /* =========================================================
-   INITIALIZE
+   INITIALIZE APPLICATION
    ========================================================= */
 
 document.addEventListener(
@@ -63,6 +76,12 @@ document.addEventListener(
 
     setupPWAInstall();
 
+    setupImportButton();
+
+    setupVisibilityHandler();
+
+    setupKeyboardShortcuts();
+
     updateGreeting();
 
     updateTodayDate();
@@ -72,6 +91,13 @@ document.addEventListener(
     updateConnectionStatus();
 
     updateNotificationButton();
+
+    startReminderChecker();
+
+    registerServiceWorker();
+
+    setupFirebaseForegroundMessage();
+
 
     setTimeout(
       function () {
@@ -120,15 +146,42 @@ function loadData() {
         PROFILE_KEY
       );
 
+
     tasks =
       savedTasks
-        ? JSON.parse(savedTasks)
+        ? JSON.parse(
+            savedTasks
+          )
         : [];
+
 
     notifications =
       savedNotifications
-        ? JSON.parse(savedNotifications)
+        ? JSON.parse(
+            savedNotifications
+          )
         : [];
+
+
+    if (
+      !Array.isArray(tasks)
+    ) {
+
+      tasks = [];
+
+    }
+
+
+    if (
+      !Array.isArray(
+        notifications
+      )
+    ) {
+
+      notifications = [];
+
+    }
+
 
     if (
       savedProfile
@@ -139,10 +192,12 @@ function loadData() {
           savedProfile
         );
 
+
       const userName =
         document.getElementById(
           "userName"
         );
+
 
       if (
         userName &&
@@ -153,6 +208,7 @@ function loadData() {
           profile.name;
 
       }
+
 
       updateProfileUI(
         profile.name,
@@ -178,27 +234,55 @@ function loadData() {
 
 
 /* =========================================================
-   SAVE DATA
+   SAVE TASKS
    ========================================================= */
 
 function saveTasks() {
 
-  localStorage.setItem(
-    TASKS_KEY,
-    JSON.stringify(tasks)
-  );
+  try {
+
+    localStorage.setItem(
+      TASKS_KEY,
+      JSON.stringify(
+        tasks
+      )
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Gagal menyimpan tugas:",
+      error
+    );
+
+  }
 
 }
 
 
+/* =========================================================
+   SAVE NOTIFICATIONS
+   ========================================================= */
+
 function saveNotifications() {
 
-  localStorage.setItem(
-    NOTIFICATIONS_KEY,
-    JSON.stringify(
-      notifications
-    )
-  );
+  try {
+
+    localStorage.setItem(
+      NOTIFICATIONS_KEY,
+      JSON.stringify(
+        notifications
+      )
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Gagal menyimpan notifikasi:",
+      error
+    );
+
+  }
 
 }
 
@@ -213,6 +297,7 @@ function setupNavigation() {
     document.querySelectorAll(
       ".nav-item"
     );
+
 
   navItems.forEach(
     function (item) {
@@ -246,10 +331,12 @@ function navigateTo(
       ".page"
     );
 
+
   const navItems =
     document.querySelectorAll(
       ".nav-item"
     );
+
 
   pages.forEach(
     function (page) {
@@ -261,6 +348,7 @@ function navigateTo(
     }
   );
 
+
   navItems.forEach(
     function (item) {
 
@@ -271,16 +359,15 @@ function navigateTo(
     }
   );
 
+
   const targetPage =
     document.querySelector(
-      `[data-page="${pageName}"]`
+      `.page[data-page="${pageName}"]`
     );
 
+
   if (
-    targetPage &&
-    targetPage.classList.contains(
-      "page"
-    )
+    targetPage
   ) {
 
     targetPage.classList.add(
@@ -289,12 +376,16 @@ function navigateTo(
 
   }
 
+
   const activeNav =
     document.querySelector(
       `.nav-item[data-page="${pageName}"]`
     );
 
-  if (activeNav) {
+
+  if (
+    activeNav
+  ) {
 
     activeNav.classList.add(
       "active"
@@ -302,21 +393,26 @@ function navigateTo(
 
   }
 
+
   window.scrollTo({
     top: 0,
     behavior: "smooth"
   });
 
+
   if (
-    pageName === "calendar"
+    pageName ===
+    "calendar"
   ) {
 
     renderCalendar();
 
   }
 
+
   if (
-    pageName === "profile"
+    pageName ===
+    "profile"
   ) {
 
     updateProfileUI();
@@ -337,11 +433,16 @@ function setupButtons() {
       "quickAddButton"
     );
 
-  if (quickAdd) {
+
+  if (
+    quickAdd
+  ) {
 
     quickAdd.addEventListener(
       "click",
       function () {
+
+        resetTaskForm();
 
         navigateTo(
           "add"
@@ -358,11 +459,16 @@ function setupButtons() {
       "emptyAddTaskButton"
     );
 
-  if (emptyAdd) {
+
+  if (
+    emptyAdd
+  ) {
 
     emptyAdd.addEventListener(
       "click",
       function () {
+
+        resetTaskForm();
 
         navigateTo(
           "add"
@@ -379,7 +485,10 @@ function setupButtons() {
       "bottomAddButton"
     );
 
-  if (bottomAdd) {
+
+  if (
+    bottomAdd
+  ) {
 
     bottomAdd.addEventListener(
       "click",
@@ -402,7 +511,10 @@ function setupButtons() {
       "addTaskFromTasksPage"
     );
 
-  if (tasksAdd) {
+
+  if (
+    tasksAdd
+  ) {
 
     tasksAdd.addEventListener(
       "click",
@@ -425,7 +537,10 @@ function setupButtons() {
       "viewAllTasksButton"
     );
 
-  if (viewAll) {
+
+  if (
+    viewAll
+  ) {
 
     viewAll.addEventListener(
       "click",
@@ -446,7 +561,10 @@ function setupButtons() {
       "profileButton"
     );
 
-  if (profileButton) {
+
+  if (
+    profileButton
+  ) {
 
     profileButton.addEventListener(
       "click",
@@ -467,7 +585,10 @@ function setupButtons() {
       "notificationButton"
     );
 
-  if (notificationButton) {
+
+  if (
+    notificationButton
+  ) {
 
     notificationButton.addEventListener(
       "click",
@@ -482,7 +603,10 @@ function setupButtons() {
       "closeNotificationPanel"
     );
 
-  if (closeNotification) {
+
+  if (
+    closeNotification
+  ) {
 
     closeNotification.addEventListener(
       "click",
@@ -497,7 +621,10 @@ function setupButtons() {
       "closeTaskModal"
     );
 
-  if (closeModal) {
+
+  if (
+    closeModal
+  ) {
 
     closeModal.addEventListener(
       "click",
@@ -512,11 +639,25 @@ function setupButtons() {
       ".modal-overlay"
     );
 
-  if (modalOverlay) {
+
+  if (
+    modalOverlay
+  ) {
 
     modalOverlay.addEventListener(
       "click",
-      closeTaskModal
+      function (event) {
+
+        if (
+          event.target ===
+          modalOverlay
+        ) {
+
+          closeTaskModal();
+
+        }
+
+      }
     );
 
   }
@@ -527,7 +668,10 @@ function setupButtons() {
       "completeTaskButton"
     );
 
-  if (completeButton) {
+
+  if (
+    completeButton
+  ) {
 
     completeButton.addEventListener(
       "click",
@@ -542,7 +686,10 @@ function setupButtons() {
       "editTaskButton"
     );
 
-  if (editButton) {
+
+  if (
+    editButton
+  ) {
 
     editButton.addEventListener(
       "click",
@@ -557,7 +704,10 @@ function setupButtons() {
       "deleteTaskButton"
     );
 
-  if (deleteButton) {
+
+  if (
+    deleteButton
+  ) {
 
     deleteButton.addEventListener(
       "click",
@@ -572,7 +722,10 @@ function setupButtons() {
       "exportDataButton"
     );
 
-  if (exportButton) {
+
+  if (
+    exportButton
+  ) {
 
     exportButton.addEventListener(
       "click",
@@ -587,7 +740,10 @@ function setupButtons() {
       "clearDataButton"
     );
 
-  if (clearButton) {
+
+  if (
+    clearButton
+  ) {
 
     clearButton.addEventListener(
       "click",
@@ -602,7 +758,10 @@ function setupButtons() {
       "enableNotificationButton"
     );
 
-  if (notificationEnable) {
+
+  if (
+    notificationEnable
+  ) {
 
     notificationEnable.addEventListener(
       "click",
@@ -625,12 +784,21 @@ function setupTaskForm() {
       "taskForm"
     );
 
-  if (!form) return;
+
+  if (
+    !form
+  ) {
+
+    return;
+
+  }
+
 
   const dateInput =
     document.getElementById(
       "taskDate"
     );
+
 
   if (
     dateInput &&
@@ -641,6 +809,7 @@ function setupTaskForm() {
       getLocalDateString();
 
   }
+
 
   form.addEventListener(
     "submit",
@@ -659,7 +828,10 @@ function setupTaskForm() {
       "resetTaskForm"
     );
 
-  if (resetButton) {
+
+  if (
+    resetButton
+  ) {
 
     resetButton.addEventListener(
       "click",
@@ -673,7 +845,10 @@ function setupTaskForm() {
                 "taskDate"
               );
 
-            if (date) {
+
+            if (
+              date
+            ) {
 
               date.value =
                 getLocalDateString();
@@ -692,50 +867,105 @@ function setupTaskForm() {
 }
 
 
+/* =========================================================
+   ADD TASK
+   ========================================================= */
+
 function addTask() {
 
-  const title =
+  const titleElement =
     document.getElementById(
       "taskTitle"
-    ).value.trim();
+    );
 
-  const description =
+
+  const descriptionElement =
     document.getElementById(
       "taskDescription"
-    ).value.trim();
+    );
 
-  const date =
+
+  const dateElement =
     document.getElementById(
       "taskDate"
-    ).value;
+    );
 
-  const time =
+
+  const timeElement =
     document.getElementById(
       "taskTime"
-    ).value;
+    );
 
-  const category =
+
+  const categoryElement =
     document.getElementById(
       "taskCategory"
-    ).value;
+    );
+
+
+  const reminderElement =
+    document.getElementById(
+      "taskReminder"
+    );
+
+
+  if (
+    !titleElement ||
+    !dateElement
+  ) {
+
+    return;
+
+  }
+
+
+  const title =
+    titleElement.value.trim();
+
+
+  const description =
+    descriptionElement
+      ? descriptionElement.value.trim()
+      : "";
+
+
+  const date =
+    dateElement.value;
+
+
+  const time =
+    timeElement
+      ? timeElement.value
+      : "";
+
+
+  const category =
+    categoryElement
+      ? categoryElement.value
+      : "lainnya";
+
 
   const priorityElement =
     document.querySelector(
       'input[name="taskPriority"]:checked'
     );
 
+
   const priority =
     priorityElement
       ? priorityElement.value
       : "low";
 
+
   const reminder =
-    document.getElementById(
-      "taskReminder"
-    ).checked;
+    reminderElement
+      ? reminderElement.checked
+      : false;
 
 
-  if (!title) {
+  if (
+    !title
+  ) {
 
     showToast(
       "⚠️",
@@ -747,7 +977,9 @@ function addTask() {
   }
 
 
-  if (!date) {
+  if (
+    !date
+  ) {
 
     showToast(
       "⚠️",
@@ -798,6 +1030,7 @@ function addTask() {
     newTask
   );
 
+
   saveTasks();
 
   renderAll();
@@ -808,6 +1041,7 @@ function addTask() {
     "home"
   );
 
+
   showToast(
     "✓",
     "Tugas berhasil ditambahkan!"
@@ -817,7 +1051,7 @@ function addTask() {
 
 
 /* =========================================================
-   RESET FORM
+   RESET TASK FORM
    ========================================================= */
 
 function resetTaskForm() {
@@ -827,30 +1061,47 @@ function resetTaskForm() {
       "taskForm"
     );
 
-  if (!form) return;
+
+  if (
+    !form
+  ) {
+
+    return;
+
+  }
+
 
   form.reset();
+
 
   const date =
     document.getElementById(
       "taskDate"
     );
 
-  if (date) {
+
+  if (
+    date
+  ) {
 
     date.value =
       getLocalDateString();
 
   }
 
+
   const low =
     document.querySelector(
       'input[name="taskPriority"][value="low"]'
     );
 
-  if (low) {
 
-    low.checked = true;
+  if (
+    low
+  ) {
+
+    low.checked =
+      true;
 
   }
 
@@ -887,6 +1138,7 @@ function renderStatistics() {
   const total =
     tasks.length;
 
+
   const completed =
     tasks.filter(
       function (task) {
@@ -896,15 +1148,19 @@ function renderStatistics() {
       }
     ).length;
 
+
   const pending =
-    total - completed;
+    total -
+    completed;
+
 
   const priority =
     tasks.filter(
       function (task) {
 
         return (
-          task.priority === "high" &&
+          task.priority ===
+            "high" &&
           !task.completed
         );
 
@@ -917,15 +1173,18 @@ function renderStatistics() {
     total
   );
 
+
   setText(
     "pendingTaskCount",
     pending
   );
 
+
   setText(
     "completedTaskCount",
     completed
   );
+
 
   setText(
     "priorityTaskCount",
@@ -946,10 +1205,19 @@ function renderTodayTasks() {
       "todayTaskList"
     );
 
-  if (!container) return;
+
+  if (
+    !container
+  ) {
+
+    return;
+
+  }
+
 
   const today =
     getLocalDateString();
+
 
   const todayTasks =
     tasks
@@ -957,7 +1225,8 @@ function renderTodayTasks() {
         function (task) {
 
           return (
-            task.date === today
+            task.date ===
+            today
           );
 
         }
@@ -967,11 +1236,13 @@ function renderTodayTasks() {
       );
 
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
 
   if (
-    todayTasks.length === 0
+    todayTasks.length ===
+    0
   ) {
 
     container.innerHTML = `
@@ -1033,7 +1304,15 @@ function renderUpcomingTasks() {
       "upcomingTaskList"
     );
 
-  if (!container) return;
+
+  if (
+    !container
+  ) {
+
+    return;
+
+  }
+
 
   const today =
     getLocalDateString();
@@ -1045,7 +1324,8 @@ function renderUpcomingTasks() {
         function (task) {
 
           return (
-            task.date > today &&
+            task.date >
+              today &&
             !task.completed
           );
 
@@ -1060,11 +1340,13 @@ function renderUpcomingTasks() {
       );
 
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
 
   if (
-    upcoming.length === 0
+    upcoming.length ===
+    0
   ) {
 
     container.innerHTML = `
@@ -1118,7 +1400,14 @@ function renderAllTasks() {
       "allTaskList"
     );
 
-  if (!container) return;
+
+  if (
+    !container
+  ) {
+
+    return;
+
+  }
 
 
   let filtered =
@@ -1126,7 +1415,8 @@ function renderAllTasks() {
 
 
   if (
-    currentFilter === "pending"
+    currentFilter ===
+    "pending"
   ) {
 
     filtered =
@@ -1142,7 +1432,8 @@ function renderAllTasks() {
 
 
   if (
-    currentFilter === "completed"
+    currentFilter ===
+    "completed"
   ) {
 
     filtered =
@@ -1158,7 +1449,8 @@ function renderAllTasks() {
 
 
   if (
-    currentFilter === "priority"
+    currentFilter ===
+    "priority"
   ) {
 
     filtered =
@@ -1166,7 +1458,8 @@ function renderAllTasks() {
         function (task) {
 
           return (
-            task.priority === "high"
+            task.priority ===
+            "high"
           );
 
         }
@@ -1189,21 +1482,36 @@ function renderAllTasks() {
 
           return (
 
-            task.title
+            String(
+              task.title ||
+              ""
+            )
               .toLowerCase()
-              .includes(query)
+              .includes(
+                query
+              )
 
             ||
 
-            task.description
+            String(
+              task.description ||
+              ""
+            )
               .toLowerCase()
-              .includes(query)
+              .includes(
+                query
+              )
 
             ||
 
-            task.category
+            String(
+              task.category ||
+              ""
+            )
               .toLowerCase()
-              .includes(query)
+              .includes(
+                query
+              )
 
           );
 
@@ -1218,11 +1526,13 @@ function renderAllTasks() {
   );
 
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
 
   if (
-    filtered.length === 0
+    filtered.length ===
+    0
   ) {
 
     container.innerHTML = `
@@ -1277,6 +1587,7 @@ function createTaskCard(
     document.createElement(
       "div"
     );
+
 
   card.className =
     "task-card" +
@@ -1343,7 +1654,9 @@ function createTaskCard(
     <div class="task-content">
 
       <h3>
-        ${escapeHTML(task.title)}
+        ${escapeHTML(
+          task.title
+        )}
       </h3>
 
       ${
@@ -1361,14 +1674,18 @@ function createTaskCard(
       <div class="task-meta">
 
         <span>
-          📅 ${formatDate(task.date)}
+          📅 ${formatDate(
+            task.date
+          )}
         </span>
 
         ${
           task.time
             ? `
               <span>
-                ⏰ ${task.time}
+                ⏰ ${escapeHTML(
+                  task.time
+                )}
               </span>
             `
             : ""
@@ -1391,7 +1708,9 @@ function createTaskCard(
         <span
           class="
             task-priority
-            priority-${task.priority}
+            priority-${escapeHTML(
+              task.priority
+            )}
           "
         >
           ${
@@ -1433,18 +1752,25 @@ function createTaskCard(
       ".check-button"
     );
 
-  checkButton.addEventListener(
-    "click",
-    function (event) {
 
-      event.stopPropagation();
+  if (
+    checkButton
+  ) {
 
-      toggleTaskComplete(
-        task.id
-      );
+    checkButton.addEventListener(
+      "click",
+      function (event) {
 
-    }
-  );
+        event.stopPropagation();
+
+        toggleTaskComplete(
+          task.id
+        );
+
+      }
+    );
+
+  }
 
 
   const moreButton =
@@ -1452,18 +1778,25 @@ function createTaskCard(
       ".task-more-button"
     );
 
-  moreButton.addEventListener(
-    "click",
-    function (event) {
 
-      event.stopPropagation();
+  if (
+    moreButton
+  ) {
 
-      openTaskModal(
-        task.id
-      );
+    moreButton.addEventListener(
+      "click",
+      function (event) {
 
-    }
-  );
+        event.stopPropagation();
+
+        openTaskModal(
+          task.id
+        );
+
+      }
+    );
+
+  }
 
 
   card.addEventListener(
@@ -1484,7 +1817,7 @@ function createTaskCard(
 
 
 /* =========================================================
-   COMPLETE TASK
+   TOGGLE COMPLETE
    ========================================================= */
 
 function toggleTaskComplete(
@@ -1495,13 +1828,22 @@ function toggleTaskComplete(
     tasks.find(
       function (item) {
 
-        return item.id === taskId;
+        return (
+          item.id ===
+          taskId
+        );
 
       }
     );
 
 
-  if (!task) return;
+  if (
+    !task
+  ) {
+
+    return;
+
+  }
 
 
   task.completed =
@@ -1514,15 +1856,12 @@ function toggleTaskComplete(
 
 
   showToast(
-
     task.completed
       ? "✓"
       : "↩️",
-
     task.completed
       ? "Tugas selesai!"
       : "Tugas dikembalikan."
-
   );
 
 }
@@ -1540,13 +1879,22 @@ function openTaskModal(
     tasks.find(
       function (item) {
 
-        return item.id === taskId;
+        return (
+          item.id ===
+          taskId
+        );
 
       }
     );
 
 
-  if (!task) return;
+  if (
+    !task
+  ) {
+
+    return;
+
+  }
 
 
   selectedTaskId =
@@ -1558,21 +1906,29 @@ function openTaskModal(
       "taskModal"
     );
 
+
   const content =
     document.getElementById(
       "taskModalContent"
     );
 
 
-  if (!modal || !content) {
+  if (
+    !modal ||
+    !content
+  ) {
+
     return;
+
   }
 
 
   content.innerHTML = `
 
     <h3>
-      ${escapeHTML(task.title)}
+      ${escapeHTML(
+        task.title
+      )}
     </h3>
 
     ${
@@ -1591,7 +1947,9 @@ function openTaskModal(
 
     <p>
       📅 <strong>Tanggal:</strong>
-      ${formatDate(task.date)}
+      ${formatDate(
+        task.date
+      )}
     </p>
 
     ${
@@ -1599,7 +1957,9 @@ function openTaskModal(
         ? `
           <p>
             ⏰ <strong>Waktu:</strong>
-            ${task.time}
+            ${escapeHTML(
+              task.time
+            )}
           </p>
         `
         : ""
@@ -1607,12 +1967,16 @@ function openTaskModal(
 
     <p>
       📌 <strong>Kategori:</strong>
-      ${task.category}
+      ${escapeHTML(
+        task.category
+      )}
     </p>
 
     <p>
       🔥 <strong>Prioritas:</strong>
-      ${task.priority}
+      ${escapeHTML(
+        task.priority
+      )}
     </p>
 
     <p>
@@ -1632,7 +1996,9 @@ function openTaskModal(
     );
 
 
-  if (completeButton) {
+  if (
+    completeButton
+  ) {
 
     completeButton.textContent =
       task.completed
@@ -1656,13 +2022,17 @@ function closeTaskModal() {
       "taskModal"
     );
 
-  if (modal) {
+
+  if (
+    modal
+  ) {
 
     modal.classList.add(
       "hidden"
     );
 
   }
+
 
   selectedTaskId =
     null;
@@ -1671,13 +2041,17 @@ function closeTaskModal() {
 
 
 /* =========================================================
-   COMPLETE SELECTED
+   COMPLETE SELECTED TASK
    ========================================================= */
 
 function completeSelectedTask() {
 
-  if (!selectedTaskId) {
+  if (
+    !selectedTaskId
+  ) {
+
     return;
+
   }
 
 
@@ -1686,6 +2060,7 @@ function completeSelectedTask() {
 
 
   closeTaskModal();
+
 
   toggleTaskComplete(
     id
@@ -1700,8 +2075,12 @@ function completeSelectedTask() {
 
 function editSelectedTask() {
 
-  if (!selectedTaskId) {
+  if (
+    !selectedTaskId
+  ) {
+
     return;
+
   }
 
 
@@ -1709,43 +2088,111 @@ function editSelectedTask() {
     tasks.find(
       function (item) {
 
-        return item.id === selectedTaskId;
+        return (
+          item.id ===
+          selectedTaskId
+        );
 
       }
     );
 
 
-  if (!task) return;
+  if (
+    !task
+  ) {
+
+    return;
+
+  }
 
 
-  document.getElementById(
-    "taskTitle"
-  ).value =
-    task.title;
+  const title =
+    document.getElementById(
+      "taskTitle"
+    );
 
 
-  document.getElementById(
-    "taskDescription"
-  ).value =
-    task.description;
+  const description =
+    document.getElementById(
+      "taskDescription"
+    );
 
 
-  document.getElementById(
-    "taskDate"
-  ).value =
-    task.date;
+  const date =
+    document.getElementById(
+      "taskDate"
+    );
 
 
-  document.getElementById(
-    "taskTime"
-  ).value =
-    task.time;
+  const time =
+    document.getElementById(
+      "taskTime"
+    );
 
 
-  document.getElementById(
-    "taskCategory"
-  ).value =
-    task.category;
+  const category =
+    document.getElementById(
+      "taskCategory"
+    );
+
+
+  const reminder =
+    document.getElementById(
+      "taskReminder"
+    );
+
+
+  if (
+    title
+  ) {
+
+    title.value =
+      task.title;
+
+  }
+
+
+  if (
+    description
+  ) {
+
+    description.value =
+      task.description ||
+      "";
+
+  }
+
+
+  if (
+    date
+  ) {
+
+    date.value =
+      task.date;
+
+  }
+
+
+  if (
+    time
+  ) {
+
+    time.value =
+      task.time ||
+      "";
+
+  }
+
+
+  if (
+    category
+  ) {
+
+    category.value =
+      task.category ||
+      "lainnya";
+
+  }
 
 
   const priority =
@@ -1754,7 +2201,9 @@ function editSelectedTask() {
     );
 
 
-  if (priority) {
+  if (
+    priority
+  ) {
 
     priority.checked =
       true;
@@ -1762,17 +2211,24 @@ function editSelectedTask() {
   }
 
 
-  document.getElementById(
-    "taskReminder"
-  ).checked =
-    task.reminder;
+  if (
+    reminder
+  ) {
+
+    reminder.checked =
+      !!task.reminder;
+
+  }
 
 
   tasks =
     tasks.filter(
       function (item) {
 
-        return item.id !== task.id;
+        return (
+          item.id !==
+          task.id
+        );
 
       }
     );
@@ -1801,8 +2257,12 @@ function editSelectedTask() {
 
 function deleteSelectedTask() {
 
-  if (!selectedTaskId) {
+  if (
+    !selectedTaskId
+  ) {
+
     return;
+
   }
 
 
@@ -1812,8 +2272,12 @@ function deleteSelectedTask() {
     );
 
 
-  if (!confirmed) {
+  if (
+    !confirmed
+  ) {
+
     return;
+
   }
 
 
@@ -1821,7 +2285,10 @@ function deleteSelectedTask() {
     tasks.filter(
       function (task) {
 
-        return task.id !== selectedTaskId;
+        return (
+          task.id !==
+          selectedTaskId
+        );
 
       }
     );
@@ -1853,13 +2320,16 @@ function setupSearch() {
       "taskSearchInput"
     );
 
+
   const clear =
     document.getElementById(
       "clearSearchButton"
     );
 
 
-  if (input) {
+  if (
+    input
+  ) {
 
     input.addEventListener(
       "input",
@@ -1867,6 +2337,7 @@ function setupSearch() {
 
         currentSearch =
           input.value.trim();
+
 
         renderAllTasks();
 
@@ -1876,21 +2347,27 @@ function setupSearch() {
   }
 
 
-  if (clear) {
+  if (
+    clear
+  ) {
 
     clear.addEventListener(
       "click",
       function () {
 
-        if (input) {
+        if (
+          input
+        ) {
 
           input.value =
             "";
 
         }
 
+
         currentSearch =
           "";
+
 
         renderAllTasks();
 
@@ -1963,21 +2440,26 @@ function setupCalendar() {
       "previousMonthButton"
     );
 
+
   const next =
     document.getElementById(
       "nextMonthButton"
     );
 
 
-  if (previous) {
+  if (
+    previous
+  ) {
 
     previous.addEventListener(
       "click",
       function () {
 
         currentCalendarDate.setMonth(
-          currentCalendarDate.getMonth() - 1
+          currentCalendarDate.getMonth() -
+            1
         );
+
 
         renderCalendar();
 
@@ -1987,15 +2469,19 @@ function setupCalendar() {
   }
 
 
-  if (next) {
+  if (
+    next
+  ) {
 
     next.addEventListener(
       "click",
       function () {
 
         currentCalendarDate.setMonth(
-          currentCalendarDate.getMonth() + 1
+          currentCalendarDate.getMonth() +
+            1
         );
+
 
         renderCalendar();
 
@@ -2013,6 +2499,7 @@ function renderCalendar() {
     document.getElementById(
       "calendarDays"
     );
+
 
   const monthTitle =
     document.getElementById(
@@ -2032,6 +2519,7 @@ function renderCalendar() {
 
   const year =
     currentCalendarDate.getFullYear();
+
 
   const month =
     currentCalendarDate.getMonth();
@@ -2061,8 +2549,11 @@ function renderCalendar() {
     ).toLocaleDateString(
       "id-ID",
       {
-        month: "long",
-        year: "numeric"
+        month:
+          "long",
+
+        year:
+          "numeric"
       }
     );
 
@@ -2081,6 +2572,11 @@ function renderCalendar() {
       document.createElement(
         "div"
       );
+
+
+    empty.className =
+      "calendar-day empty";
+
 
     daysContainer.appendChild(
       empty
@@ -2159,6 +2655,20 @@ function renderCalendar() {
     }
 
 
+    if (
+      dateString ===
+      formatDateForInput(
+        selectedCalendarDate
+      )
+    ) {
+
+      button.classList.add(
+        "selected"
+      );
+
+    }
+
+
     button.addEventListener(
       "click",
       function () {
@@ -2166,7 +2676,8 @@ function renderCalendar() {
         selectedCalendarDate =
           date;
 
-        renderSelectedDateTasks();
+
+        renderCalendar();
 
       }
     );
@@ -2195,14 +2706,19 @@ function renderSelectedDateTasks() {
       "selectedDateTaskList"
     );
 
+
   const title =
     document.getElementById(
       "selectedDateTitle"
     );
 
 
-  if (!container) {
+  if (
+    !container
+  ) {
+
     return;
+
   }
 
 
@@ -2229,7 +2745,9 @@ function renderSelectedDateTasks() {
       );
 
 
-  if (title) {
+  if (
+    title
+  ) {
 
     title.textContent =
       formatDate(
@@ -2244,7 +2762,8 @@ function renderSelectedDateTasks() {
 
 
   if (
-    selectedTasks.length === 0
+    selectedTasks.length ===
+    0
   ) {
 
     container.innerHTML = `
@@ -2299,7 +2818,9 @@ function setupProfile() {
     );
 
 
-  if (saveButton) {
+  if (
+    saveButton
+  ) {
 
     saveButton.addEventListener(
       "click",
@@ -2308,12 +2829,6 @@ function setupProfile() {
 
   }
 
-
-  /*
-     UPLOAD FOTO PROFIL
-     Dibuat otomatis jika belum
-     ada input upload di HTML.
-  */
 
   const avatar =
     document.querySelector(
@@ -2333,14 +2848,18 @@ function setupProfile() {
         "input"
       );
 
+
     input.type =
       "file";
+
 
     input.id =
       "profilePhotoInput";
 
+
     input.accept =
       "image/*";
+
 
     input.style.display =
       "none";
@@ -2379,6 +2898,10 @@ function setupProfile() {
 }
 
 
+/* =========================================================
+   SAVE PROFILE
+   ========================================================= */
+
 function saveProfile() {
 
   const input =
@@ -2393,13 +2916,26 @@ function saveProfile() {
       : "";
 
 
-  const oldProfile =
-    JSON.parse(
-      localStorage.getItem(
-        PROFILE_KEY
-      ) ||
-      "{}"
-    );
+  let oldProfile =
+    {};
+
+
+  try {
+
+    oldProfile =
+      JSON.parse(
+        localStorage.getItem(
+          PROFILE_KEY
+        ) ||
+        "{}"
+      );
+
+  } catch (error) {
+
+    oldProfile =
+      {};
+
+  }
 
 
   const profile = {
@@ -2437,6 +2973,10 @@ function saveProfile() {
 }
 
 
+/* =========================================================
+   PROFILE PHOTO
+   ========================================================= */
+
 function handleProfilePhoto(
   event
 ) {
@@ -2445,8 +2985,12 @@ function handleProfilePhoto(
     event.target.files[0];
 
 
-  if (!file) {
+  if (
+    !file
+  ) {
+
     return;
+
   }
 
 
@@ -2477,13 +3021,26 @@ function handleProfilePhoto(
         e.target.result;
 
 
-      const oldProfile =
-        JSON.parse(
-          localStorage.getItem(
-            PROFILE_KEY
-          ) ||
-          "{}"
-        );
+      let oldProfile =
+        {};
+
+
+      try {
+
+        oldProfile =
+          JSON.parse(
+            localStorage.getItem(
+              PROFILE_KEY
+            ) ||
+            "{}"
+          );
+
+      } catch (error) {
+
+        oldProfile =
+          {};
+
+      }
 
 
       const profile = {
@@ -2527,18 +3084,35 @@ function handleProfilePhoto(
 }
 
 
+/* =========================================================
+   UPDATE PROFILE UI
+   ========================================================= */
+
 function updateProfileUI(
   name,
   photo
 ) {
 
-  const saved =
-    JSON.parse(
-      localStorage.getItem(
-        PROFILE_KEY
-      ) ||
-      "{}"
-    );
+  let saved =
+    {};
+
+
+  try {
+
+    saved =
+      JSON.parse(
+        localStorage.getItem(
+          PROFILE_KEY
+        ) ||
+        "{}"
+      );
+
+  } catch (error) {
+
+    saved =
+      {};
+
+  }
 
 
   name =
@@ -2589,15 +3163,21 @@ function updateProfileUI(
     );
 
 
-  if (avatar) {
+  if (
+    avatar
+  ) {
 
-    if (photo) {
+    if (
+      photo
+    ) {
 
       avatar.style.backgroundImage =
         `url("${photo}")`;
 
+
       avatar.style.backgroundSize =
         "cover";
+
 
       avatar.style.backgroundPosition =
         "center";
@@ -2609,7 +3189,9 @@ function updateProfileUI(
         );
 
 
-      if (text) {
+      if (
+        text
+      ) {
 
         text.style.display =
           "none";
@@ -2621,13 +3203,16 @@ function updateProfileUI(
       avatar.style.backgroundImage =
         "";
 
+
       const text =
         document.getElementById(
           "largeProfileInitial"
         );
 
 
-      if (text) {
+      if (
+        text
+      ) {
 
         text.style.display =
           "block";
@@ -2645,15 +3230,21 @@ function updateProfileUI(
     );
 
 
-  if (profileButton) {
+  if (
+    profileButton
+  ) {
 
-    if (photo) {
+    if (
+      photo
+    ) {
 
       profileButton.style.backgroundImage =
         `url("${photo}")`;
 
+
       profileButton.style.backgroundSize =
         "cover";
+
 
       profileButton.style.backgroundPosition =
         "center";
@@ -2665,7 +3256,9 @@ function updateProfileUI(
         );
 
 
-      if (initialElement) {
+      if (
+        initialElement
+      ) {
 
         initialElement.style.display =
           "none";
@@ -2677,13 +3270,16 @@ function updateProfileUI(
       profileButton.style.backgroundImage =
         "";
 
+
       const initialElement =
         document.getElementById(
           "profileInitial"
         );
 
 
-      if (initialElement) {
+      if (
+        initialElement
+      ) {
 
         initialElement.style.display =
           "block";
@@ -2703,21 +3299,13 @@ function updateProfileUI(
 
 function setupNotifications() {
 
-  /*
-    Tidak langsung menampilkan
-    "Browser tidak mendukung".
-
-    Tombol akan mencoba Firebase
-    Messaging + Service Worker.
-  */
-
   updateNotificationButton();
 
 }
 
 
 /* =========================================================
-   ENABLE FIREBASE NOTIFICATIONS
+   ENABLE NOTIFICATIONS
    ========================================================= */
 
 async function enableNotifications() {
@@ -2730,17 +3318,13 @@ async function enableNotifications() {
     );
 
 
-    /*
-      Pastikan Firebase sudah dimuat
-    */
-
     if (
       !window.taskTimeFirebase
     ) {
 
       showToast(
         "❌",
-        "Firebase belum siap. Tunggu sebentar lalu coba lagi."
+        "Firebase belum siap. Periksa konfigurasi Firebase."
       );
 
       return;
@@ -2748,27 +3332,22 @@ async function enableNotifications() {
     }
 
 
-    /*
-      Cek Service Worker
-    */
-
     if (
-      !("serviceWorker" in navigator)
+      !(
+        "serviceWorker" in
+        navigator
+      )
     ) {
 
       showToast(
         "❌",
-        "Service Worker tidak tersedia di aplikasi ini."
+        "Service Worker tidak tersedia."
       );
 
       return;
 
     }
 
-
-    /*
-      Register Firebase Messaging SW
-    */
 
     const registration =
       await navigator.serviceWorker.register(
@@ -2776,45 +3355,20 @@ async function enableNotifications() {
       );
 
 
-    console.log(
-      "Firebase Messaging Service Worker:",
-      registration.scope
-    );
-
-
-    /*
-      Tunggu Service Worker aktif
-    */
-
     await navigator.serviceWorker.ready;
 
-
-    /*
-      Permission
-
-      Jika Notification API tersedia,
-      minta izin.
-
-      Jika tidak tersedia,
-      tetap lanjut mencoba FCM.
-    */
 
     let permission =
       "default";
 
 
     if (
-      "Notification" in window
+      "Notification" in
+      window
     ) {
 
       permission =
         await Notification.requestPermission();
-
-
-      console.log(
-        "Notification permission:",
-        permission
-      );
 
 
       if (
@@ -2824,25 +3378,15 @@ async function enableNotifications() {
 
         showToast(
           "❌",
-          "Notifikasi ditolak. Aktifkan izin notifikasi TaskTime di pengaturan HP."
+          "Izin notifikasi ditolak. Aktifkan izin dari pengaturan HP."
         );
 
         return;
 
       }
 
-    } else {
-
-      console.warn(
-        "Notification API tidak tersedia. Melanjutkan melalui Firebase Messaging."
-      );
-
     }
 
-
-    /*
-      Ambil Firebase Messaging
-    */
 
     const messaging =
       window
@@ -2878,10 +3422,6 @@ async function enableNotifications() {
     }
 
 
-    /*
-      Ambil FCM TOKEN
-    */
-
     const token =
       await getToken(
         messaging,
@@ -2897,11 +3437,13 @@ async function enableNotifications() {
       );
 
 
-    if (!token) {
+    if (
+      !token
+    ) {
 
       showToast(
         "⚠️",
-        "FCM Token belum tersedia. Coba aktifkan lagi."
+        "FCM Token belum tersedia."
       );
 
       return;
@@ -2910,25 +3452,14 @@ async function enableNotifications() {
 
 
     console.log(
-      "================================="
-    );
-
-    console.log(
       "TASKTIME FCM TOKEN:"
     );
+
 
     console.log(
       token
     );
 
-    console.log(
-      "================================="
-    );
-
-
-    /*
-      Simpan token
-    */
 
     localStorage.setItem(
       FCM_TOKEN_KEY,
@@ -2942,16 +3473,8 @@ async function enableNotifications() {
     );
 
 
-    /*
-      Update tombol
-    */
-
     updateNotificationButton();
 
-
-    /*
-      Tambahkan notifikasi lokal
-    */
 
     addNotification(
       "Notifikasi Aktif",
@@ -3005,7 +3528,7 @@ async function enableNotifications() {
     ) {
 
       message =
-        "Firebase Messaging tidak didukung oleh browser/PWA ini.";
+        "Firebase Messaging tidak didukung browser ini.";
 
     }
 
@@ -3032,8 +3555,12 @@ function updateNotificationButton() {
     );
 
 
-  if (!button) {
+  if (
+    !button
+  ) {
+
     return;
+
   }
 
 
@@ -3139,14 +3666,19 @@ function renderNotifications() {
       "notificationList"
     );
 
+
   const badge =
     document.getElementById(
       "notificationBadge"
     );
 
 
-  if (!list) {
+  if (
+    !list
+  ) {
+
     return;
+
   }
 
 
@@ -3160,12 +3692,15 @@ function renderNotifications() {
     ).length;
 
 
-  if (badge) {
+  if (
+    badge
+  ) {
 
     badge.textContent =
       unread > 99
         ? "99+"
         : unread;
+
 
     badge.style.display =
       unread > 0
@@ -3176,7 +3711,8 @@ function renderNotifications() {
 
 
   if (
-    notifications.length === 0
+    notifications.length ===
+    0
   ) {
 
     list.innerHTML = `
@@ -3205,7 +3741,9 @@ function renderNotifications() {
 
 
   notifications.forEach(
-    function (notification) {
+    function (
+      notification
+    ) {
 
       const item =
         document.createElement(
@@ -3214,7 +3752,12 @@ function renderNotifications() {
 
 
       item.className =
-        "notification-item";
+        "notification-item" +
+        (
+          notification.read
+            ? ""
+            : " unread"
+        );
 
 
       item.innerHTML = `
@@ -3277,8 +3820,12 @@ function toggleNotificationPanel() {
     );
 
 
-  if (!panel) {
+  if (
+    !panel
+  ) {
+
     return;
+
   }
 
 
@@ -3327,7 +3874,9 @@ function closeNotificationPanel() {
     );
 
 
-  if (panel) {
+  if (
+    panel
+  ) {
 
     panel.classList.add(
       "hidden"
@@ -3342,10 +3891,6 @@ function closeNotificationPanel() {
    TOAST
    ========================================================= */
 
-let toastTimeout =
-  null;
-
-
 function showToast(
   icon,
   message
@@ -3356,10 +3901,12 @@ function showToast(
       "toast"
     );
 
+
   const toastIcon =
     document.getElementById(
       "toastIcon"
     );
+
 
   const toastMessage =
     document.getElementById(
@@ -3371,7 +3918,7 @@ function showToast(
     !toast
   ) {
 
-    alert(
+    console.log(
       message
     );
 
@@ -3380,7 +3927,9 @@ function showToast(
   }
 
 
-  if (toastIcon) {
+  if (
+    toastIcon
+  ) {
 
     toastIcon.textContent =
       icon;
@@ -3388,7 +3937,9 @@ function showToast(
   }
 
 
-  if (toastMessage) {
+  if (
+    toastMessage
+  ) {
 
     toastMessage.textContent =
       message;
@@ -3437,9 +3988,1520 @@ function setupPWAInstall() {
 
       event.preventDefault();
 
+
       deferredInstallPrompt =
         event;
 
 
       const button =
-        document.getElement
+        document.getElementById(
+          "installAppButton"
+        );
+
+
+      if (
+        button
+      ) {
+
+        button.style.display =
+          "block";
+
+      }
+
+    }
+  );
+
+
+  window.addEventListener(
+    "appinstalled",
+    function () {
+
+      deferredInstallPrompt =
+        null;
+
+
+      const button =
+        document.getElementById(
+          "installAppButton"
+        );
+
+
+      if (
+        button
+      ) {
+
+        button.style.display =
+          "none";
+
+      }
+
+
+      addNotification(
+        "TaskTime Terpasang",
+        "TaskTime berhasil dipasang sebagai aplikasi."
+      );
+
+
+      showToast(
+        "📱",
+        "TaskTime berhasil dipasang!"
+      );
+
+    }
+  );
+
+
+  const button =
+    document.getElementById(
+      "installAppButton"
+    );
+
+
+  if (
+    button
+  ) {
+
+    button.addEventListener(
+      "click",
+      installPWA
+    );
+
+
+    if (
+      !deferredInstallPrompt
+    ) {
+
+      button.style.display =
+        "none";
+
+    }
+
+  }
+
+}
+
+
+async function installPWA() {
+
+  if (
+    !deferredInstallPrompt
+  ) {
+
+    showToast(
+      "ℹ️",
+      "Aplikasi belum tersedia untuk diinstal."
+    );
+
+    return;
+
+  }
+
+
+  deferredInstallPrompt.prompt();
+
+
+  const result =
+    await deferredInstallPrompt.userChoice;
+
+
+  console.log(
+    "Install result:",
+    result.outcome
+  );
+
+
+  deferredInstallPrompt =
+    null;
+
+
+  const button =
+    document.getElementById(
+      "installAppButton"
+    );
+
+
+  if (
+    button
+  ) {
+
+    button.style.display =
+      "none";
+
+  }
+
+}
+
+
+window.installPWA =
+  installPWA;
+
+
+/* =========================================================
+   GREETING
+   ========================================================= */
+
+function updateGreeting() {
+
+  const greeting =
+    document.getElementById(
+      "greetingText"
+    );
+
+
+  if (
+    !greeting
+  ) {
+
+    return;
+
+  }
+
+
+  const hour =
+    new Date().getHours();
+
+
+  let text =
+    "Selamat pagi";
+
+
+  if (
+    hour >= 12 &&
+    hour < 15
+  ) {
+
+    text =
+      "Selamat siang";
+
+  }
+
+
+  else if (
+    hour >= 15 &&
+    hour < 18
+  ) {
+
+    text =
+      "Selamat sore";
+
+  }
+
+
+  else if (
+    hour >= 18 ||
+    hour < 5
+  ) {
+
+    text =
+      "Selamat malam";
+
+  }
+
+
+  greeting.textContent =
+    text;
+
+}
+
+
+/* =========================================================
+   TODAY DATE
+   ========================================================= */
+
+function updateTodayDate() {
+
+  const element =
+    document.getElementById(
+      "todayDate"
+    );
+
+
+  if (
+    !element
+  ) {
+
+    return;
+
+  }
+
+
+  element.textContent =
+    new Date()
+      .toLocaleDateString(
+        "id-ID",
+        {
+
+          weekday:
+            "long",
+
+          day:
+            "numeric",
+
+          month:
+            "long",
+
+          year:
+            "numeric"
+
+        }
+      );
+
+}
+
+
+/* =========================================================
+   CONNECTION STATUS
+   ========================================================= */
+
+function updateConnectionStatus() {
+
+  const status =
+    document.getElementById(
+      "connectionStatus"
+    );
+
+
+  if (
+    !status
+  ) {
+
+    return;
+
+  }
+
+
+  function update() {
+
+    if (
+      navigator.onLine
+    ) {
+
+      status.textContent =
+        "Online";
+
+
+      status.classList.remove(
+        "offline"
+      );
+
+
+      status.classList.add(
+        "online"
+      );
+
+    } else {
+
+      status.textContent =
+        "Offline";
+
+
+      status.classList.remove(
+        "online"
+      );
+
+
+      status.classList.add(
+        "offline"
+      );
+
+    }
+
+  }
+
+
+  update();
+
+
+  window.addEventListener(
+    "online",
+    function () {
+
+      update();
+
+
+      showToast(
+        "🌐",
+        "Koneksi internet kembali."
+      );
+
+    }
+  );
+
+
+  window.addEventListener(
+    "offline",
+    function () {
+
+      update();
+
+
+      showToast(
+        "📡",
+        "Offline. TaskTime tetap bisa digunakan."
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   SORT TASKS
+   ========================================================= */
+
+function sortTasks(
+  a,
+  b
+) {
+
+  if (
+    a.completed !==
+    b.completed
+  ) {
+
+    return a.completed
+      ? 1
+      : -1;
+
+  }
+
+
+  const dateA =
+    a.date ||
+    "";
+
+
+  const dateB =
+    b.date ||
+    "";
+
+
+  if (
+    dateA !==
+    dateB
+  ) {
+
+    return dateA.localeCompare(
+      dateB
+    );
+
+  }
+
+
+  const timeA =
+    a.time ||
+    "23:59";
+
+
+  const timeB =
+    b.time ||
+    "23:59";
+
+
+  return timeA.localeCompare(
+    timeB
+  );
+
+}
+
+
+/* =========================================================
+   DATE HELPERS
+   ========================================================= */
+
+function getLocalDateString() {
+
+  return formatDateForInput(
+    new Date()
+  );
+
+}
+
+
+function formatDateForInput(
+  date
+) {
+
+  const year =
+    date.getFullYear();
+
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  return (
+    year +
+    "-" +
+    month +
+    "-" +
+    day
+  );
+
+}
+
+
+function formatDate(
+  dateString
+) {
+
+  if (
+    !dateString
+  ) {
+
+    return "-";
+
+  }
+
+
+  const parts =
+    dateString.split(
+      "-"
+    );
+
+
+  if (
+    parts.length !==
+    3
+  ) {
+
+    return dateString;
+
+  }
+
+
+  const date =
+    new Date(
+      Number(
+        parts[0]
+      ),
+      Number(
+        parts[1]
+      ) - 1,
+      Number(
+        parts[2]
+      )
+    );
+
+
+  if (
+    isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return dateString;
+
+  }
+
+
+  return date.toLocaleDateString(
+    "id-ID",
+    {
+
+      day:
+        "numeric",
+
+      month:
+        "long",
+
+      year:
+        "numeric"
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   TEXT HELPER
+   ========================================================= */
+
+function setText(
+  elementId,
+  value
+) {
+
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+
+  if (
+    element
+  ) {
+
+    element.textContent =
+      value;
+
+  }
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHTML(
+  value
+) {
+
+  if (
+    value ===
+      null ||
+    value ===
+      undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(
+    value
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =========================================================
+   CLEAR ALL DATA
+   ========================================================= */
+
+function clearAllData() {
+
+  const confirmed =
+    confirm(
+      "Yakin ingin menghapus semua data TaskTime?"
+    );
+
+
+  if (
+    !confirmed
+  ) {
+
+    return;
+
+  }
+
+
+  const doubleConfirmed =
+    confirm(
+      "Data tugas, notifikasi, dan profil akan dihapus. Lanjutkan?"
+    );
+
+
+  if (
+    !doubleConfirmed
+  ) {
+
+    return;
+
+  }
+
+
+  tasks =
+    [];
+
+
+  notifications =
+    [];
+
+
+  localStorage.removeItem(
+    TASKS_KEY
+  );
+
+
+  localStorage.removeItem(
+    NOTIFICATIONS_KEY
+  );
+
+
+  localStorage.removeItem(
+    PROFILE_KEY
+  );
+
+
+  localStorage.removeItem(
+    FCM_TOKEN_KEY
+  );
+
+
+  localStorage.removeItem(
+    NOTIFICATION_ENABLED_KEY
+  );
+
+
+  updateProfileUI(
+    "Pengguna TaskTime",
+    ""
+  );
+
+
+  const userName =
+    document.getElementById(
+      "userName"
+    );
+
+
+  if (
+    userName
+  ) {
+
+    userName.value =
+      "";
+
+  }
+
+
+  renderAll();
+
+  updateNotificationButton();
+
+
+  showToast(
+    "🗑️",
+    "Semua data berhasil dihapus."
+  );
+
+}
+
+
+/* =========================================================
+   EXPORT DATA
+   ========================================================= */
+
+function exportData() {
+
+  const data = {
+
+    app:
+      "TaskTime",
+
+    version:
+      "1.0.0",
+
+    exportedAt:
+      new Date().toISOString(),
+
+    tasks:
+      tasks,
+
+    notifications:
+      notifications,
+
+    profile:
+      JSON.parse(
+        localStorage.getItem(
+          PROFILE_KEY
+        ) ||
+        "{}"
+      )
+
+  };
+
+
+  const json =
+    JSON.stringify(
+      data,
+      null,
+      2
+    );
+
+
+  const blob =
+    new Blob(
+      [json],
+      {
+        type:
+          "application/json"
+      }
+    );
+
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const link =
+    document.createElement(
+      "a"
+    );
+
+
+  link.href =
+    url;
+
+
+  link.download =
+    "tasktime-backup-" +
+    getLocalDateString() +
+    ".json";
+
+
+  document.body.appendChild(
+    link
+  );
+
+
+  link.click();
+
+
+  link.remove();
+
+
+  URL.revokeObjectURL(
+    url
+  );
+
+
+  showToast(
+    "📦",
+    "Data berhasil diekspor."
+  );
+
+}
+
+
+/* =========================================================
+   IMPORT DATA
+   ========================================================= */
+
+function importDataFile(
+  file
+) {
+
+  if (
+    !file
+  ) {
+
+    return;
+
+  }
+
+
+  const reader =
+    new FileReader();
+
+
+  reader.onload =
+    function (event) {
+
+      try {
+
+        const data =
+          JSON.parse(
+            event.target.result
+          );
+
+
+        if (
+          !data ||
+          typeof data !==
+            "object"
+        ) {
+
+          throw new Error(
+            "Format tidak valid"
+          );
+
+        }
+
+
+        if (
+          Array.isArray(
+            data.tasks
+          )
+        ) {
+
+          tasks =
+            data.tasks;
+
+
+          saveTasks();
+
+        }
+
+
+        if (
+          Array.isArray(
+            data.notifications
+          )
+        ) {
+
+          notifications =
+            data.notifications;
+
+
+          saveNotifications();
+
+        }
+
+
+        if (
+          data.profile &&
+          typeof data.profile ===
+            "object"
+        ) {
+
+          localStorage.setItem(
+            PROFILE_KEY,
+            JSON.stringify(
+              data.profile
+            )
+          );
+
+        }
+
+
+        renderAll();
+
+        updateProfileUI();
+
+
+        showToast(
+          "✅",
+          "Data berhasil dipulihkan."
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Import error:",
+          error
+        );
+
+
+        showToast(
+          "❌",
+          "File backup tidak valid."
+        );
+
+      }
+
+    };
+
+
+  reader.readAsText(
+    file
+  );
+
+}
+
+
+/* =========================================================
+   IMPORT BUTTON
+   ========================================================= */
+
+function setupImportButton() {
+
+  const exportButton =
+    document.getElementById(
+      "exportDataButton"
+    );
+
+
+  if (
+    !exportButton ||
+    document.getElementById(
+      "importDataButton"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const importButton =
+    document.createElement(
+      "button"
+    );
+
+
+  importButton.id =
+    "importDataButton";
+
+
+  importButton.type =
+    "button";
+
+
+  importButton.className =
+    exportButton.className;
+
+
+  importButton.textContent =
+    "📥 Impor Data";
+
+
+  if (
+    exportButton.parentNode
+  ) {
+
+    exportButton.parentNode.appendChild(
+      importButton
+    );
+
+  }
+
+
+  const input =
+    document.createElement(
+      "input"
+    );
+
+
+  input.type =
+    "file";
+
+
+  input.accept =
+    ".json,application/json";
+
+
+  input.style.display =
+    "none";
+
+
+  document.body.appendChild(
+    input
+  );
+
+
+  importButton.addEventListener(
+    "click",
+    function () {
+
+      input.click();
+
+    }
+  );
+
+
+  input.addEventListener(
+    "change",
+    function () {
+
+      const file =
+        input.files[0];
+
+
+      if (
+        file
+      ) {
+
+        importDataFile(
+          file
+        );
+
+      }
+
+
+      input.value =
+        "";
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   TASK REMINDER CHECKER
+   ========================================================= */
+
+function checkTaskReminders() {
+
+  const now =
+    new Date();
+
+
+  const today =
+    getLocalDateString();
+
+
+  const currentTime =
+    now
+      .toTimeString()
+      .slice(
+        0,
+        5
+      );
+
+
+  tasks.forEach(
+    function (task) {
+
+      if (
+        task.completed ||
+        !task.reminder ||
+        task.date !==
+          today ||
+        !task.time
+      ) {
+
+        return;
+
+      }
+
+
+      const reminderKey =
+        "taskTimeReminder_" +
+        task.id +
+        "_" +
+        task.date +
+        "_" +
+        task.time;
+
+
+      if (
+        localStorage.getItem(
+          reminderKey
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        task.time ===
+        currentTime
+      ) {
+
+        localStorage.setItem(
+          reminderKey,
+          "true"
+        );
+
+
+        addNotification(
+          "Pengingat Tugas",
+          "Waktunya mengerjakan: " +
+            task.title
+        );
+
+
+        showToast(
+          "🔔",
+          "Pengingat: " +
+            task.title
+        );
+
+
+        if (
+          "Notification" in
+            window &&
+          Notification.permission ===
+            "granted"
+        ) {
+
+          try {
+
+            new Notification(
+              "TaskTime — Pengingat Tugas",
+              {
+
+                body:
+                  task.title,
+
+                icon:
+                  "./icons/icon-192.png",
+
+                badge:
+                  "./icons/icon-192.png"
+
+              }
+            );
+
+          } catch (error) {
+
+            console.error(
+              "Notification error:",
+              error
+            );
+
+          }
+
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   START REMINDER CHECKER
+   ========================================================= */
+
+function startReminderChecker() {
+
+  checkTaskReminders();
+
+
+  if (
+    reminderInterval
+  ) {
+
+    clearInterval(
+      reminderInterval
+    );
+
+  }
+
+
+  reminderInterval =
+    setInterval(
+      checkTaskReminders,
+      30000
+    );
+
+}
+
+
+/* =========================================================
+   SERVICE WORKER
+   ========================================================= */
+
+function registerServiceWorker() {
+
+  if (
+    !(
+      "serviceWorker" in
+      navigator
+    )
+  ) {
+
+    console.warn(
+      "Service Worker tidak didukung."
+    );
+
+    return;
+
+  }
+
+
+  window.addEventListener(
+    "load",
+    async function () {
+
+      try {
+
+        const registration =
+          await navigator.serviceWorker.register(
+            "./service-worker.js"
+          );
+
+
+        console.log(
+          "Service Worker berhasil:",
+          registration.scope
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Service Worker gagal:",
+          error
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   FIREBASE FOREGROUND MESSAGE
+   ========================================================= */
+
+function setupFirebaseForegroundMessage() {
+
+  if (
+    !window.taskTimeFirebase
+  ) {
+
+    return;
+
+  }
+
+
+  const messaging =
+    window
+      .taskTimeFirebase
+      .messaging;
+
+
+  const onMessage =
+    window
+      .taskTimeFirebase
+      .onMessage;
+
+
+  if (
+    !messaging ||
+    typeof onMessage !==
+      "function"
+  ) {
+
+    return;
+
+  }
+
+
+  onMessage(
+    messaging,
+    function (payload) {
+
+      console.log(
+        "Firebase message:",
+        payload
+      );
+
+
+      const notification =
+        payload.notification ||
+        {};
+
+
+      const title =
+        notification.title ||
+        "TaskTime";
+
+
+      const body =
+        notification.body ||
+        "Kamu memiliki pengingat baru.";
+
+
+      addNotification(
+        title,
+        body
+      );
+
+
+      showToast(
+        "🔔",
+        body
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   PAGE VISIBILITY
+   ========================================================= */
+
+function setupVisibilityHandler() {
+
+  document.addEventListener(
+    "visibilitychange",
+    function () {
+
+      if (
+        !document.hidden
+      ) {
+
+        renderAll();
+
+        updateGreeting();
+
+        updateTodayDate();
+
+        checkTaskReminders();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   KEYBOARD SHORTCUTS
+   ========================================================= */
+
+function setupKeyboardShortcuts() {
+
+  document.addEventListener(
+    "keydown",
+    function (event) {
+
+      if (
+        (
+          event.ctrlKey ||
+          event.metaKey
+        ) &&
+        event.key.toLowerCase() ===
+          "k"
+      ) {
+
+        const search =
+          document.getElementById(
+            "taskSearchInput"
+          );
+
+
+        if (
+          search
+        ) {
+
+          event.preventDefault();
+
+          search.focus();
+
+        }
+
+      }
+
+
+      if (
+        event.key ===
+        "Escape"
+      ) {
+
+        closeTaskModal();
+
+        closeNotificationPanel();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   GLOBAL FUNCTIONS
+   ========================================================= */
+
+window.navigateTo =
+  navigateTo;
+
+
+window.openTaskModal =
+  openTaskModal;
+
+
+window.closeTaskModal =
+  closeTaskModal;
+
+
+window.toggleTaskComplete =
+  toggleTaskComplete;
+
+
+window.addTask =
+  addTask;
+
+
+window.resetTaskForm =
+  resetTaskForm;
+
+
+window.renderAll =
+  renderAll;
+
+
+window.formatDate =
+  formatDate;
+
+
+window.clearAllData =
+  clearAllData;
+
+
+window.exportData =
+  exportData;
+
+
+window.importDataFile =
+  importDataFile;
+
+
+/* =========================================================
+   TASKTIME READY
+   ========================================================= */
+
+console.log(
+  "================================="
+);
+
+console.log(
+  "TASKTIME APP READY"
+);
+
+console.log(
+  "Version: 1.0.0"
+);
+
+console.log(
+  "Offline PWA: Ready"
+);
+
+console.log(
+  "LocalStorage: Ready"
+);
+
+console.log(
+  "Firebase Messaging: Ready"
+);
+
+console.log(
+  "================================="
+);
